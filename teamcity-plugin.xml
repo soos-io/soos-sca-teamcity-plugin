@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+                  xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
+  <info>
+    <name>soos-security-analyst</name>
+    <display-name>Soos Security Analyst</display-name>
+    <version>0.1.0</version>
+    <description>Scan your open source software for vulnerabilities and control the introduction of new dependencies</description>
+    <download-url>Plugin download URL</download-url>
+    <email>support@soos.io</email>
+    <vendor>
+      <name>soos.io</name>
+      <url>https://soos.io/</url>
+      <logo>Plugin vendor logo URL</logo>
+    </vendor>
+  </info>
+  <deployment use-separate-classloader="true"/>
+</teamcity-plugin>
