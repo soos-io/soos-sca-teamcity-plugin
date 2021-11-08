@@ -54,14 +54,25 @@ public class SoosAnalysis extends RunType {
             describeParameters(properties);
             List<InvalidProperty> list = new ArrayList<>();
             final String projectName = properties.get(Constants.MAP_PARAM_PROJECT_NAME_KEY);
+            final String analysisResultMaxWait = properties.get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY);
+            final String analysisResultPollingInterval = properties.get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY);
 
-            if ( projectName == null ) {
+            if ( ObjectUtils.isEmpty(projectName) ) {
                 list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, "Should not be null"));
             }
             
-            if( projectName != null && projectName.length() < 5){
+            if( !ObjectUtils.isEmpty(projectName) && projectName.length() < 5){
                 list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, "Should be more than 5 characters"));
             }
+
+            if( !ObjectUtils.isEmpty(analysisResultMaxWait) && !validateNumber(analysisResultMaxWait)){
+                list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, "Should be a number"));
+            }
+            
+            if( !ObjectUtils.isEmpty(analysisResultPollingInterval) && !validateNumber(analysisResultPollingInterval)){
+                list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY , "Should be a number"));
+            }
+        
 
             return list;
         };
@@ -100,4 +111,12 @@ public class SoosAnalysis extends RunType {
         return "Parameters: ".concat(stringParams);
     }
 
+    private Boolean validateNumber(String value) {
+        try {
+            Integer.parseInt(value);
+            return true;
+        } catch ( Exception e ){
+            return false;
+        }
+    }
 }
