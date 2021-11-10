@@ -19,7 +19,7 @@ Our full list of supported manifest formats can be found [here](https://kb.soos.
 
 Can find the plugin on [Jetbrains Marketplace](https://plugins.jetbrains.com/).
 
-To manually install the plugin, download the zip file to 'plugins' dir under TeamCity data directory. 
+To manually install the plugin, download the zip file to 'plugins' directory under TeamCity data directory. 
 
 | Select/Inputs | Default | Description |
 | --- | --- | --- |
@@ -40,12 +40,12 @@ To manually install the plugin, download the zip file to 'plugins' dir under Tea
 
 #### Authorization
 
-**SOOS Analysis Integration Plugin** needs environment variables called **System properties (System.)** in teamcity which are passed as parameters. These System properties have to be declared as Parameters inside the project or the build settings, and they are required for the plugin to operate.
+**SOOS Analysis Integration Plugin** needs environment variables called **system properties (system.)** in teamcity which are passed as parameters. These system properties have to be declared as Parameters inside the project or the build settings, and they are required for the plugin to operate.
 
 | Property | Description |
 | --- | --- |
-| System.SOOS_CLIENT_ID | Provided to you when subscribing to SOOS services. |
-| System.SOOS_API_KEY | Provided to you when subscribing to SOOS services. |
+| system.SOOS_CLIENT_ID | Provided to you when subscribing to SOOS services. |
+| system.SOOS_API_KEY | Provided to you when subscribing to SOOS services. |
 
 These values can be found in the SOOS App under Integrate.
 
