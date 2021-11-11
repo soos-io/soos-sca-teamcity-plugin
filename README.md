@@ -1,6 +1,29 @@
-# SOOS Analysis Integration Plugin for TeamCity
+# SOOS SCA Plugin
 
-The **SOOS Analysis Integration Plugin** allows to scan your open source software for vulnerabilities and control the introduction of new dependencies, it will send and analyse your manifest files. It can be run using either synchronous or asynchronous mode.
+<img src="assets/SOOS_Icon.png" style="margin-bottom: 10px;" width="100" alt="SOOS Icon">
+
+SOOS is the affordable, easy-to-integrate Software Composition Analysis solution for your whole team.
+
+## Features
+- Scan your Open Source Software, Webapps and Containers for vulnerabilities
+- Ease of integration (run your first scan in minutes or get your first scan results within minutes)
+- Control the introduction of new dependencies and vulnerabilities
+- Exclude unwanted license-types
+- Detect and prevent dependency substitutions and typo-squatting
+- Generate SBOMs
+- Fill out your compliance worksheets with confidence
+- Simple and affordable pricing. Only one plan that includes every feature we offer plus unlimited projects, unlimited users, and no scan limits.
+
+## How to Use
+
+The **SOOS SCA Plugin** adds the ability to scan your open source software for vulnerabilities and control the introduction of new dependencies, it will send and analyse your manifest files. It can be run using either synchronous or asynchronous mode.
+
+To use SOOS SCA Plugin you need to:
+
+1. [Install the SOOS SCA Plugin](#install-the-soos-sca-plugin)
+2. [Configure authorization](#configure-authorization)
+3. [Select the mode](#select-the-mode)
+4. [Configure other plugin's parameters](#configure-other-plugins-parameters)
 
 ## Supported Languages and Package Managers
 
@@ -17,9 +40,63 @@ Our full list of supported manifest formats can be found [here](https://kb.soos.
 
 ## Setup
 
-Can find the plugin on [Jetbrains Marketplace](https://plugins.jetbrains.com/).
+### Install the SOOS SCA Plugin
 
-To manually install the plugin, download the zip file to 'plugins' directory under TeamCity data directory. 
+Install or upgrade the SOOS SCA Plugin from Jetbrains Marketplace with these steps. Once complete, you’re all set to add a SOOS SCA step to your projects.
+
+Log in to your TeamCity instance to install the SOOS SCA Plugin. Configure the Plugins list to Periodically check for plugin updates, in order to ensure regular automatic upgrades in the background. Navigate to the JetBrains Plugins Repository, search for **SOOS SCA** and from the Get dropdown list, select to install the plugin for your TeamCity installation. When the following prompt appears, click Install. When the installation ends, the Administration Plugins List loads, notifying the plugin has been uploaded. Ensure the plugin is enabled.
+
+<blockquote style="margin-bottom: 10px;">
+<details>
+<summary> Show example </summary>
+
+<img src="assets/prompt-image-to-show.png" style="margin-top: 10px; margin-bottom: 10px;" alt="Prompt-image-to-show">
+
+</details>
+</blockquote>
+
+To manually install the plugin you have two options:
+
+1.  Download the zip file into 'plugins' directory under TeamCity data directory.
+2.  Download the zip file, log in to your TeamCity instance, go to Administration > Plugins, and click the "Upload plugin zip" button, choose the **soos-sca-plugin.zip** file, when the following prompt appears, click Upload plugin zip. Ensure the plugin is enabled.
+
+<blockquote style="margin-bottom: 10px;">
+<details>
+<summary> Show example </summary>
+
+<img src="assets/upload-plugin-zip-example.png" style="margin-top: 10px; margin-bottom: 10px;" alt="Upload Plugin Zip Example">
+
+</details>
+</blockquote>
+
+### Configure authorization
+
+**SOOS SCA Plugin** needs environment variables called **system properties (system.)** in teamcity which are passed as parameters. These system properties have to be declared as Parameters inside the project or the build settings, and they are required for the plugin to operate.
+
+| Property | Description |
+| --- | --- |
+| system.SOOS_CLIENT_ID | Provided to you when subscribing to SOOS services. |
+| system.SOOS_API_KEY | Provided to you when subscribing to SOOS services. |
+
+These values can be found in the SOOS App under Integrate.
+
+### Select the mode
+
+#### Run and wait for the analysis report
+Set the **Mode** parameter to *Run and wait*, then you can run the plans in your CI/CD, and wait for the scan to complete.
+
+#### Start the Scan
+Set the **Mode** parameter to *Async init*, if you don't care about the scan result in your CI/CD plan, this is all you have to do!
+
+#### Wait for the Scan
+If you care about the result or want to break the build when issues occur, add a second task close to the end of your plan to give the scan as much time as possible to complete, setting the **Mode** parameter to *Async result*.
+
+
+### Configure other plugin's parameters
+
+<blockquote style="margin-bottom: 10px;">
+<details>
+<summary> Show parameters </summary>
 
 | Select/Inputs | Default | Description |
 | --- | --- | --- |
@@ -37,27 +114,11 @@ To manually install the plugin, download the zip file to 'plugins' directory und
 | Build Version | ""  | Version of application build artifacts |
 | Build URI | ""  | URI to CI build info |
 
+</details>
+</blockquote>
 
-#### Authorization
-
-**SOOS Analysis Integration Plugin** needs environment variables called **system properties (system.)** in teamcity which are passed as parameters. These system properties have to be declared as Parameters inside the project or the build settings, and they are required for the plugin to operate.
-
-| Property | Description |
-| --- | --- |
-| system.SOOS_CLIENT_ID | Provided to you when subscribing to SOOS services. |
-| system.SOOS_API_KEY | Provided to you when subscribing to SOOS services. |
-
-These values can be found in the SOOS App under Integrate.
-
-#### Run and wait for the analysis report
-Set the **Mode** parameter to *Run and wait*, then you can run the plans in your CI/CD, and wait for the scan to complete.
-
-#### Start the Scan
-Set the **Mode** parameter to *Async init*, if you don't care about the scan result in your CI/CD plan, this is all you have to do!
-
-#### Wait for the Scan
-If you care about the result or want to break the build when issues occur, add a second task close to the end of your plan to give the scan as much time as possible to complete, setting the **Mode** parameter to *Async result*.
 
 ## Feedback and Support
 ### Knowledge Base
 [Go To Knowledge Base](https://kb.soos.io/help)
+
