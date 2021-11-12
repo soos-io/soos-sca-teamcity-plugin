@@ -23,7 +23,7 @@ To use SOOS SCA Plugin you need to:
 1. [Install the SOOS SCA Plugin](#install-the-soos-sca-plugin)
 2. [Configure authorization](#configure-authorization)
 3. [Select the mode](#select-the-mode)
-4. [Configure other plugin's parameters](#configure-other-plugins-parameters)
+4. [Configure other plugin parameters](#configure-other-plugin-parameters)
 
 ## Supported Languages and Package Managers
 
@@ -92,7 +92,7 @@ Set the **Mode** parameter to *Async init*, if you don't care about the scan res
 If you care about the result or want to break the build when issues occur, add a second task close to the end of your plan to give the scan as much time as possible to complete, setting the **Mode** parameter to *Async result*.
 
 
-### Configure other plugin's parameters
+### Configure other plugin parameters
 
 <blockquote style="margin-bottom: 10px;">
 <details>
