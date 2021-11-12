@@ -33,7 +33,7 @@
 
     <dependency>
       <groupId>io.soos</groupId>
-      <artifactId>io.soos.integration</artifactId>
+      <artifactId>sca</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
