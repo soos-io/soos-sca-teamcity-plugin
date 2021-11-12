@@ -1,6 +1,6 @@
 # SOOS SCA Plugin
 
-<img src="assets/SOOS_Icon.png" style="margin-bottom: 10px;" width="100" alt="SOOS Icon">
+<img src="assets/SOOS_logo.png" style="margin-bottom: 10px;" width="350" alt="SOOS Icon">
 
 SOOS is the affordable, easy-to-integrate Software Composition Analysis solution for your whole team.
 

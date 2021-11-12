@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="soos-sca-plugin">SOOS SCA Plugin</h1>
+<img src="assets/SOOS_logo.png" style="margin-bottom: 10px;" width="350" alt="SOOS Icon">
+<p>SOOS is the affordable, easy-to-integrate Software Composition Analysis solution for your whole team.</p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Scan your Open Source Software, Webapps and Containers for vulnerabilities</li>
+<li>Ease of integration (run your first scan in minutes or get your first scan results within minutes)</li>
+<li>Control the introduction of new dependencies and vulnerabilities</li>
+<li>Exclude unwanted license-types</li>
+<li>Detect and prevent dependency substitutions and typo-squatting</li>
+<li>Generate SBOMs</li>
+<li>Fill out your compliance worksheets with confidence</li>
+<li>Simple and affordable pricing. Only one plan that includes every feature we offer plus unlimited projects, unlimited users, and no scan limits.</li>
+</ul>
+<h2 id="how-to-use">How to Use</h2>
+<p>The <strong>SOOS SCA Plugin</strong> adds the ability to scan your open source software for vulnerabilities and control the introduction of new dependencies, it will send and analyse your manifest files. It can be run using either synchronous or asynchronous mode.</p>
+<p>To use SOOS SCA Plugin you need to:</p>
+<ol>
+<li><a href="#install-the-soos-sca-plugin">Install the SOOS SCA Plugin</a></li>
+<li><a href="#configure-authorization">Configure authorization</a></li>
+<li><a href="#select-the-mode">Select the mode</a></li>
+<li><a href="#configure-other-plugins-parameters">Configure other plugin's parameters</a></li>
+</ol>
+<h2 id="supported-languages-and-package-managers">Supported Languages and Package Managers</h2>
+<ul>
+<li><a href="https://www.npmjs.com/">Node (NPM)</a></li>
+<li><a href="https://pypi.org/">Python (pypi)</a></li>
+<li><a href="https://www.nuget.org/">.NET (NuGet)</a></li>
+<li><a href="https://rubygems.org/">Ruby (Ruby Gems)</a></li>
+<li><a href="https://maven.apache.org/">Java (Maven)</a></li>
+</ul>
+<p>Our full list of supported manifest formats can be found <a href="https://kb.soos.io/help/soos-languages-supported">here</a>.</p>
+<h2 id="need-an-account">Need an Account?</h2>
+<p><strong>Visit <a href="https://app.soos.io/register">soos.io</a> to create your trial account.</strong></p>
+<h2 id="setup">Setup</h2>
+<h3 id="install-the-soos-sca-plugin">Install the SOOS SCA Plugin</h3>
+<p>Install or upgrade the SOOS SCA Plugin from Jetbrains Marketplace with these steps. Once complete, you’re all set to add a SOOS SCA step to your projects.</p>
+<p>Log in to your TeamCity instance to install the SOOS SCA Plugin. Configure the Plugins list to Periodically check for plugin updates, in order to ensure regular automatic upgrades in the background. Navigate to the JetBrains Plugins Repository, search for <strong>SOOS SCA</strong> and from the Get dropdown list, select to install the plugin for your TeamCity installation. When the following prompt appears, click Install. When the installation ends, the Administration Plugins List loads, notifying the plugin has been uploaded. Ensure the plugin is enabled.</p>
+<blockquote style="margin-bottom: 10px;">
+<details>
+<summary> Show example </summary>
+<img src="assets/prompt-image-to-show.png" style="margin-top: 10px; margin-bottom: 10px;" alt="Prompt-image-to-show">
+</details>
+</blockquote>
+<p>To manually install the plugin you have two options:</p>
+<ol>
+<li>Download the zip file into 'plugins' directory under TeamCity data directory.</li>
+<li>Download the zip file, log in to your TeamCity instance, go to Administration &gt; Plugins, and click the &quot;Upload plugin zip&quot; button, choose the <strong>soos-sca-plugin.zip</strong> file, when the following prompt appears, click Upload plugin zip. Ensure the plugin is enabled.</li>
+</ol>
+<blockquote style="margin-bottom: 10px;">
+<details>
+<summary> Show example </summary>
+<img src="assets/upload-plugin-zip-example.png" style="margin-top: 10px; margin-bottom: 10px;" alt="Upload Plugin Zip Example">
+</details>
+</blockquote>
+<h3 id="configure-authorization">Configure authorization</h3>
+<p><strong>SOOS SCA Plugin</strong> needs environment variables called <strong>system properties (system.)</strong> in teamcity which are passed as parameters. These system properties have to be declared as Parameters inside the project or the build settings, and they are required for the plugin to operate.</p>
+<table>
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>system.SOOS_CLIENT_ID</td>
+<td>Provided to you when subscribing to SOOS services.</td>
+</tr>
+<tr>
+<td>system.SOOS_API_KEY</td>
+<td>Provided to you when subscribing to SOOS services.</td>
+</tr>
+</tbody>
+</table>
+<p>These values can be found in the SOOS App under Integrate.</p>
+<h3 id="select-the-mode">Select the mode</h3>
+<h4 id="run-and-wait-for-the-analysis-report">Run and wait for the analysis report</h4>
+<p>Set the <strong>Mode</strong> parameter to <em>Run and wait</em>, then you can run the plans in your CI/CD, and wait for the scan to complete.</p>
+<h4 id="start-the-scan">Start the Scan</h4>
+<p>Set the <strong>Mode</strong> parameter to <em>Async init</em>, if you don't care about the scan result in your CI/CD plan, this is all you have to do!</p>
+<h4 id="wait-for-the-scan">Wait for the Scan</h4>
+<p>If you care about the result or want to break the build when issues occur, add a second task close to the end of your plan to give the scan as much time as possible to complete, setting the <strong>Mode</strong> parameter to <em>Async result</em>.</p>
+<h3 id="configure-other-plugins-parameters">Configure other plugin's parameters</h3>
+<blockquote style="margin-bottom: 10px;">
+<details>
+<summary> Show parameters </summary>
+<table>
+<thead>
+<tr>
+<th>Select/Inputs</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Project Name</td>
+<td>&quot;&quot;</td>
+<td>REQUIRED. A custom project name that will present itself as a collection of test results within your soos.io dashboard.</td>
+</tr>
+<tr>
+<td>Mode</td>
+<td>&quot;run_and_wait&quot;</td>
+<td>Running mode, alternatives: &quot;async_init&quot; - &quot;async_result&quot;</td>
+</tr>
+<tr>
+<td>On Failure</td>
+<td>&quot;fail_the_build&quot;</td>
+<td>Stop the building in case of failure, alternative: &quot;continue_on_failure&quot;</td>
+</tr>
+<tr>
+<td>Operating System</td>
+<td>&quot;linux&quot;</td>
+<td>System info regarding operating system, etc., alternatives: &quot;win&quot; - &quot;mac&quot;</td>
+</tr>
+<tr>
+<td>Analysis Res. Max Wait</td>
+<td>300</td>
+<td>Maximum seconds to wait for Analysis Result before exiting with error.</td>
+</tr>
+<tr>
+<td>Analysis Res. Polling Interval</td>
+<td>10</td>
+<td>Polling interval (in seconds) for analysis result completion (success/failure.). Min 10.</td>
+</tr>
+<tr>
+<td>Directories To Exclude</td>
+<td>&quot;&quot;</td>
+<td>List (comma separated) of directories (relative to ./) to exclude from the search for manifest files. Example - Correct: bin/start/ ... Example - Incorrect: ./bin/start/ ... Example - Incorrect: /bin/start/'</td>
+</tr>
+<tr>
+<td>Files To Exclude</td>
+<td>&quot;&quot;</td>
+<td>List (comma separated) of files (relative to ./) to exclude from the search for manifest files. Example - Correct: bin/start/manifest.txt ... Example - Incorrect: ./bin/start/manifest.txt ... Example - Incorrect: /bin/start/manifest.txt'</td>
+</tr>
+<tr>
+<td>Commit Hash</td>
+<td>&quot;&quot;</td>
+<td>The commit hash value from the SCM System</td>
+</tr>
+<tr>
+<td>Branch Name</td>
+<td>&quot;&quot;</td>
+<td>The name of the branch from the SCM System</td>
+</tr>
+<tr>
+<td>Branch URI</td>
+<td>&quot;&quot;</td>
+<td>The URI to the branch from the SCM System</td>
+</tr>
+<tr>
+<td>Build Version</td>
+<td>&quot;&quot;</td>
+<td>Version of application build artifacts</td>
+</tr>
+<tr>
+<td>Build URI</td>
+<td>&quot;&quot;</td>
+<td>URI to CI build info</td>
+</tr>
+</tbody>
+</table>
+</details>
+</blockquote>
+<h2 id="feedback-and-support">Feedback and Support</h2>
+<h3 id="knowledge-base">Knowledge Base</h3>
+<p><a href="https://kb.soos.io/help">Go To Knowledge Base</a></p>
+
+</body>
+</html>
