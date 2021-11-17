@@ -101,8 +101,8 @@ If you care about the result or want to break the build when issues occur, add a
 | Select/Inputs | Default | Description |
 | --- | --- | --- |
 | Project Name | ""  | REQUIRED. A custom project name that will present itself as a collection of test results within your soos.io dashboard. |
-| Mode | "run_and_wait"  | Running mode, alternatives: "async_init" - "async_result" |
-| On Failure | "fail_the_build"  | Stop the building in case of failure, alternative: "continue_on_failure" |
+| Mode | "Run and wait"  | Running mode, alternatives: "Async init" - "Async result" |
+| On Failure | "Fail the build"  | Stop the building in case of failure, alternative: "Continue on failure" |
 | Operating System | "linux"  | System info regarding operating system, etc., alternatives: "win" - "mac" |
 | Analysis Res. Max Wait | 300  | Maximum seconds to wait for Analysis Result before exiting with error. |
 | Analysis Res. Polling Interval | 10  | Polling interval (in seconds) for analysis result completion (success/failure.). Min 10. |
