@@ -3,7 +3,7 @@
                   xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
   <info>
     <name>soos-sca</name>
-    <display-name>Soos SCA Plugin</display-name>º
+    <display-name>Soos SCA Plugin</display-name>
     <version>0.1.0</version>
     <description>Scan your open source software for vulnerabilities and control the introduction of new dependencies</description>
     <download-url>Plugin download URL</download-url>
