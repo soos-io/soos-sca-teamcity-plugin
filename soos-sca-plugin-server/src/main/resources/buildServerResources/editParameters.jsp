@@ -63,14 +63,9 @@
                 <props:selectProperty name="${operatingEnvironment}">
                     <props:option value="linux">Linux</props:option>
                     <props:option value="win">Windows</props:option>
-                    <props:option value="mac">MacOs</props:option>
+                    <props:option value="mac">Mac Os</props:option>
                 </props:selectProperty>
-                <!-- <props:textProperty name="${operatingEnvironment}" size="36" />
-                <span class="error" id="error_${operatingEnvironment}"></span> -->
             </div>
-           <!--  <div>
-                <label>Permitted OS: <strong>win</strong> | <strong>mac</strong> | <strong>linux</strong></label>
-            </div> -->
         </td>
     </tr>
     <tr>

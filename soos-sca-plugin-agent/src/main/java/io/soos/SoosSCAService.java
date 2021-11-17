@@ -34,24 +34,26 @@ public class SoosSCAService extends BuildServiceAdapter {
 
         Map<String, String> map = new HashMap<String,String>();
 
-        String dirsToExclude = addSoosDirToExclusion(getRunnerParameters().get(Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY));
+        Map<String, String> runnerParameters = getRunnerParameters();
 
-        map.put(Constants.PARAM_PROJECT_NAME_KEY, getRunnerParameters().get(Constants.MAP_PARAM_PROJECT_NAME_KEY));
-        map.put(Constants.PARAM_MODE_KEY, getRunnerParameters().get(Constants.MAP_PARAM_MODE_KEY));
-        map.put(Constants.PARAM_ON_FAILURE_KEY, getRunnerParameters().get(Constants.MAP_PARAM_ON_FAILURE_KEY));
+        String dirsToExclude = addSoosDirToExclusion(runnerParameters.get(Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY));
+
+        map.put(Constants.PARAM_PROJECT_NAME_KEY, runnerParameters.get(Constants.MAP_PARAM_PROJECT_NAME_KEY));
+        map.put(Constants.PARAM_MODE_KEY, runnerParameters.get(Constants.MAP_PARAM_MODE_KEY));
+        map.put(Constants.PARAM_ON_FAILURE_KEY, runnerParameters.get(Constants.MAP_PARAM_ON_FAILURE_KEY));
         map.put(Constants.PARAM_DIRS_TO_EXCLUDE_KEY, dirsToExclude);
-        map.put(Constants.PARAM_FILES_TO_EXCLUDE_KEY, getRunnerParameters().get(Constants.MAP_PARAM_FILES_TO_EXCLUDE_KEY));
-        map.put(Constants.PARAM_WORKSPACE_DIR_KEY, getRunnerParameters().get("teamcity.build.workingDir"));
-        map.put(Constants.PARAM_CHECKOUT_DIR_KEY, getRunnerParameters().get("teamcity.build.checkoutDir"));
-        map.put(Constants.PARAM_API_BASE_URI_KEY,"https://dev-api.soos.io/api/"); //Constants.SOOS_DEFAULT_API_URL
-        map.put(Constants.PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY));
-        map.put(Constants.PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY));
-        map.put(Constants.PARAM_OPERATING_ENVIRONMENT_KEY, getRunnerParameters().get(Constants.MAP_PARAM_OPERATING_ENVIRONMENT_KEY)); // GETOUT
-        map.put(Constants.PARAM_BRANCH_NAME_KEY, getRunnerParameters().get(Constants.MAP_PARAM_BRANCH_NAME_KEY)); 
-        map.put(Constants.PARAM_BRANCH_URI_KEY, getRunnerParameters().get(Constants.MAP_PARAM_BRANCH_URI_KEY));        
-        map.put(Constants.PARAM_COMMIT_HASH_KEY, getRunnerParameters().get(Constants.MAP_PARAM_COMMIT_HASH_KEY));     
-        map.put(Constants.PARAM_BUILD_VERSION_KEY, getRunnerParameters().get(Constants.MAP_PARAM_BUILD_VERSION_KEY));
-        map.put(Constants.PARAM_BUILD_URI_KEY, getRunnerParameters().get(Constants.MAP_PARAM_BUILD_URI_KEY));
+        map.put(Constants.PARAM_FILES_TO_EXCLUDE_KEY, runnerParameters.get(Constants.MAP_PARAM_FILES_TO_EXCLUDE_KEY));
+        map.put(Constants.PARAM_WORKSPACE_DIR_KEY, runnerParameters.get(PluginConstants.WORKING_DIR));
+        map.put(Constants.PARAM_CHECKOUT_DIR_KEY, runnerParameters.get(PluginConstants.CHECKOUT_DIR));
+        map.put(Constants.PARAM_API_BASE_URI_KEY,PluginConstants.SOOS_DEFAULT_API_URL);
+        map.put(Constants.PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, runnerParameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY));
+        map.put(Constants.PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, runnerParameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY));
+        map.put(Constants.PARAM_OPERATING_ENVIRONMENT_KEY, runnerParameters.get(Constants.MAP_PARAM_OPERATING_ENVIRONMENT_KEY));
+        map.put(Constants.PARAM_BRANCH_NAME_KEY, runnerParameters.get(Constants.MAP_PARAM_BRANCH_NAME_KEY));
+        map.put(Constants.PARAM_BRANCH_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_BRANCH_URI_KEY));
+        map.put(Constants.PARAM_COMMIT_HASH_KEY, runnerParameters.get(Constants.MAP_PARAM_COMMIT_HASH_KEY));
+        map.put(Constants.PARAM_BUILD_VERSION_KEY, runnerParameters.get(Constants.MAP_PARAM_BUILD_VERSION_KEY));
+        map.put(Constants.PARAM_BUILD_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_BUILD_URI_KEY));
         map.put(Constants.PARAM_INTEGRATION_NAME_KEY, PluginConstants.INTEGRATION_NAME);
         
         if(StringUtils.isBlank(getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY))) {
@@ -62,10 +64,7 @@ public class SoosSCAService extends BuildServiceAdapter {
         }
 
         String onFailure = getRunnerParameters().get(Constants.MAP_PARAM_ON_FAILURE_KEY);
-        getRunnerParameters().forEach((k,v) -> {
-            LOG.severe(k + " - " +v);
-			
-		});
+
         setEnvProperties(map);
         String reportUrl = "";
         try {
@@ -121,7 +120,6 @@ public class SoosSCAService extends BuildServiceAdapter {
         map.forEach((key, value) -> {
             if(StringUtils.isNotBlank(value)) {
                 System.setProperty(key, value);
-                LOG.warning(key + ": "+ value);
             }
         });
 
@@ -129,7 +127,7 @@ public class SoosSCAService extends BuildServiceAdapter {
 
     private void setExecutableAttribute(String script) throws RunBuildException {
         try {
-            TCStreamUtil.setFileMode(new File(script), "a+x");
+            TCStreamUtil.setFileMode(new File(script), PluginConstants.FILE_MODE);
         } catch ( Throwable t ){
             throw new RunBuildException("Failed to set executable attribute for custom script '".concat(script).concat("'"), t);
         }

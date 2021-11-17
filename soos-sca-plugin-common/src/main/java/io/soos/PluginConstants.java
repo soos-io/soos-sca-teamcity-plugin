@@ -8,6 +8,10 @@ public interface PluginConstants {
     String INTEGRATION_NAME = "Teamcity";
     String SOOS_DIR_NAME = "soos";
     String EDIT_PARAMETERS_FILE_NAME = "editParameters.jsp";
+    String SOOS_DEFAULT_API_URL = "https://dev-api.soos.io/api/";
+    String WORKING_DIR = "teamcity.build.workingDir";
+    String CHECKOUT_DIR = "teamcity.build.checkoutDir";
+    String FILE_MODE = "a+x";
 
 
 }
