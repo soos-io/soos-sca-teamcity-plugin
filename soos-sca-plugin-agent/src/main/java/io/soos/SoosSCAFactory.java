@@ -18,7 +18,7 @@ public class SoosSCAFactory implements CommandLineBuildServiceFactory{
         return new AgentBuildRunnerInfo() {
 
             @Override
-            public boolean canRun(BuildAgentConfiguration arg0) {
+            public boolean canRun( BuildAgentConfiguration buildAgentConfiguration ) {
                 return true;
             }
 

@@ -7,6 +7,7 @@ public interface PluginConstants {
     String FAIL_THE_BUILD = "fail_the_build";
     String INTEGRATION_NAME = "Teamcity";
     String SOOS_DIR_NAME = "soos";
+    String EDIT_PARAMETERS_FILE_NAME = "editParameters.jsp";
 
 
 }

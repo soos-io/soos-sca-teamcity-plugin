@@ -58,19 +58,19 @@ public class SoosSCA extends RunType {
             final String analysisResultPollingInterval = properties.get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY);
 
             if ( ObjectUtils.isEmpty(projectName) ) {
-                list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, "Should not be null"));
+                list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, ErrorMessage.SHOULD_NOT_BE_NULL));
             }
             
             if( !ObjectUtils.isEmpty(projectName) && projectName.length() < 5){
-                list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, "Should be more than 5 characters"));
+                list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, ErrorMessage.SHOULD_BE_MORE_THAN_5_CHARACTERS));
             }
 
             if( !ObjectUtils.isEmpty(analysisResultMaxWait) && !validateNumber(analysisResultMaxWait)){
-                list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, "Should be a number"));
+                list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, ErrorMessage.SHOULD_BE_A_NUMBER));
             }
             
             if( !ObjectUtils.isEmpty(analysisResultPollingInterval) && !validateNumber(analysisResultPollingInterval)){
-                list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY , "Should be a number"));
+                list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY , ErrorMessage.SHOULD_BE_A_NUMBER));
             }
         
 
@@ -80,7 +80,7 @@ public class SoosSCA extends RunType {
     }
     @Override
     public String getEditRunnerParamsJspFilePath() {
-       return descriptor.getPluginResourcesPath("editParameters.jsp");
+       return descriptor.getPluginResourcesPath(PluginConstants.EDIT_PARAMETERS_FILE_NAME);
     }
 
     @Override
