@@ -31,3 +31,5 @@ readme.txt
 chain.crt
 private.pem
 target
+.classpath
+.project
