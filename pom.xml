@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.soos</groupId>
-  <artifactId>soos-sca-plugin</artifactId>
+  <artifactId>soos-sca</artifactId>
   <version>1.0.0</version>
   <packaging>pom</packaging>
   <properties>
@@ -27,8 +27,6 @@
               <groupId>org.jetbrains.teamcity</groupId>
               <artifactId>teamcity-sdk-maven-plugin</artifactId>
               <version>0.4.1</version>
-              <configuration>
-              </configuration>
           </plugin>
       </plugins>
       <pluginManagement>
@@ -37,16 +35,14 @@
                   <groupId>org.jetbrains.teamcity</groupId>
                   <artifactId>teamcity-sdk-maven-plugin</artifactId>
                   <version>0.4.1</version>
-                  <configuration>
-                  </configuration>
               </plugin>
           </plugins>
       </pluginManagement>
   </build>
   <modules>
-    <module>soos-sca-plugin-server</module>
-    <module>soos-sca-plugin-agent</module>
-    <module>soos-sca-plugin-common</module>
+    <module>soos-sca-server</module>
+    <module>soos-sca-agent</module>
+    <module>soos-sca-common</module>
     <module>build</module>
   </modules>
 </project>

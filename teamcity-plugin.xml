@@ -4,9 +4,9 @@
   <info>
     <name>soos-sca</name>
     <display-name>Soos SCA Plugin</display-name>
-    <version>0.1.0</version>
+    <version>1.0.0</version>
     <description>Scan your open source software for vulnerabilities and control the introduction of new dependencies</description>
-    <download-url>Plugin download URL</download-url>
+    <download-url>https://github.com/soos-io/soos-sca-teamcity</download-url>
     <email>support@soos.io</email>
     <vendor>
       <name>soos.io</name>

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import io.soos.integration.domain.Mode;
 import org.apache.commons.lang3.StringUtils;
 
 import io.soos.integration.commons.Constants;
@@ -67,29 +68,34 @@ public class SoosSCAService extends BuildServiceAdapter {
 
         setEnvProperties(map);
         String reportUrl = "";
+        Mode mode;
         try {
             SOOS soos = new SOOS();
 
             StructureResponse structure = soos.getStructure();
-            System.out.println(structure.toString());
+            LOG.info(structure.toString());
 
             long filesProcessed = soos.sendManifestFiles(structure.getProjectId(), structure.getAnalysisId());
             LOG.info("File processed: ".concat(String.valueOf(filesProcessed)));
-            
+            mode = soos.getMode();
             if(filesProcessed > 0) {
                 soos.startAnalysis(structure.getProjectId(), structure.getAnalysisId());
-
+                AnalysisResultResponse results;
                 switch (soos.getMode()) {
                     case RUN_AND_WAIT:
-                        AnalysisResultResponse results = soos.getResults(structure.getReportStatusUrl());
+                        results = soos.getResults(structure.getReportStatusUrl());
                         reportUrl = soos.getStructure().getReportURL();
-
                         LOG.info(results.toString());
-                        
                         break;
                     case ASYNC_INIT:
+                        LOG.info("async_init mode selected, starting asynchronous analysis...");
+                        soos.startAnalysis(structure.getProjectId(), structure.getAnalysisId());
                         break;
                     case ASYNC_RESULT:
+                        LOG.info("async_result mode selected, getting result from previous analysis...");
+                        results = soos.getResults(structure.getReportStatusUrl());
+                        reportUrl = soos.getStructure().getReportURL();
+                        LOG.info(results.toString());
                         break;
                 }
 
@@ -97,7 +103,10 @@ public class SoosSCAService extends BuildServiceAdapter {
 
         } catch (Exception e) {
             LOG.severe(e.toString());
-            RunBuildException exception = new RunBuildException("SOOS SCA cannot be done, error: ".concat(e.toString()));
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("SOOS SCA cannot be done, error: ").append(e.toString());
+
+            RunBuildException exception = new RunBuildException(errorMsg.toString());
             exception.setLogStacktrace(false);
             if(onFailure.equals(PluginConstants.FAIL_THE_BUILD)){
                 throw exception;
@@ -105,10 +114,15 @@ public class SoosSCAService extends BuildServiceAdapter {
                 return new SimpleProgramCommandLine(getRunnerContext(), "/bin/echo", Arrays.asList(new String[]{exception.toString()}));
             }
         }
-    
-        final String scriptContent = "/bin/echo 'CLICK ON THE LINK TO SEE THE REPORT: ".concat(reportUrl).concat("'");
 
-        final String script = getCustomScript(scriptContent);
+        StringBuilder scriptContent = new StringBuilder();
+        if( !mode.equals(Mode.ASYNC_INIT)){
+            scriptContent.append("/bin/echo 'CLICK ON THE LINK TO SEE THE REPORT: ").append(reportUrl).append("'");
+        } else {
+            scriptContent.append("/bin/echo 'async_init mode selected, starting asynchronous analysis...'");
+        }
+
+        final String script = getCustomScript(scriptContent.toString());
 
         setExecutableAttribute(script);
 
@@ -129,7 +143,9 @@ public class SoosSCAService extends BuildServiceAdapter {
         try {
             TCStreamUtil.setFileMode(new File(script), PluginConstants.FILE_MODE);
         } catch ( Throwable t ){
-            throw new RunBuildException("Failed to set executable attribute for custom script '".concat(script).concat("'"), t);
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Failed to set executable attribute for custom script '").append(script).append("'");
+            throw new RunBuildException(errorMsg.toString(), t);
         }
     }
 
@@ -140,7 +156,9 @@ public class SoosSCAService extends BuildServiceAdapter {
             myFilesToDelete.add(scriptFile);
             return scriptFile.getAbsolutePath();
         } catch ( IOException e ) {
-            RunBuildException exception = new RunBuildException("Failed to create temporary custom script in directory: ".concat(getAgentTempDirectory().toString()), e);
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Failed to create temporary custom script in directory: ").append(getAgentTempDirectory());
+            RunBuildException exception = new RunBuildException(errorMsg.toString(), e);
             exception.setLogStacktrace(false);
             throw exception;
         }
