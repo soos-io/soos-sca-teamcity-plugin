@@ -33,3 +33,4 @@ private.pem
 target
 .classpath
 .project
+.DS_Store

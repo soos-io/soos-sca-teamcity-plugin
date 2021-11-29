@@ -57,8 +57,8 @@ Log in to your TeamCity instance to install the SOOS SCA Plugin. Configure the P
 
 To manually install the plugin you have two options:
 
-1.  Download the zip file into 'plugins' directory under TeamCity data directory.
-2.  Download the zip file, log in to your TeamCity instance, go to Administration > Plugins, and click the "Upload plugin zip" button, choose the **soos-sca-plugin.zip** file, when the following prompt appears, click Upload plugin zip. Ensure the plugin is enabled.
+1.  Download and copy the .zip file into <teamcity-home>/plugins/. Restart the teamcity server. 
+2.  Download the .zip file, log in to your TeamCity instance, go to Administration > Plugins, and click the "Upload plugin zip" button, choose the **soos-sca-plugin.zip** file, when the following prompt appears, click Upload plugin zip. Ensure the plugin is enabled.
 
 <blockquote style="margin-bottom: 10px;">
 <details>
@@ -103,7 +103,7 @@ If you care about the result or want to break the build when issues occur, add a
 | Project Name | ""  | REQUIRED. A custom project name that will present itself as a collection of test results within your soos.io dashboard. |
 | Mode | "Run and wait"  | Running mode, alternatives: "Async init" - "Async result" |
 | On Failure | "Fail the build"  | Stop the building in case of failure, alternative: "Continue on failure" |
-| Operating System | "linux"  | System info regarding operating system, etc., alternatives: "win" - "mac" |
+| Operating System | "Linux"  | System info regarding operating system, etc., alternatives: "Windows" - "MacOS" |
 | Analysis Res. Max Wait | 300  | Maximum seconds to wait for Analysis Result before exiting with error. |
 | Analysis Res. Polling Interval | 10  | Polling interval (in seconds) for analysis result completion (success/failure.). Min 10. |
 | Directories To Exclude | ""  | List (comma separated) of directories (relative to ./) to exclude from the search for manifest files. Example - Correct: bin/start/ ... Example - Incorrect: ./bin/start/ ... Example - Incorrect: /bin/start/'|
