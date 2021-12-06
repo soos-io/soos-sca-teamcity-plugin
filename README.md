@@ -16,7 +16,7 @@ SOOS is the affordable, easy-to-integrate Software Composition Analysis solution
 
 ## How to Use
 
-The **SOOS SCA Plugin** adds the ability to scan your open source software for vulnerabilities and control the introduction of new dependencies, it will send and analyse your manifest files. It can be run using either synchronous or asynchronous mode.
+The **SOOS SCA Plugin** will locate and analyze any supported manifest files under the specified directory.
 
 To use SOOS SCA Plugin you need to:
 

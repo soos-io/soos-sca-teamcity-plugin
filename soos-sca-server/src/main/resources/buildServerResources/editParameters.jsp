@@ -4,6 +4,7 @@
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
+
 <c:set var="mode" value="<%=Constants.MAP_PARAM_MODE_KEY%>"/>
 <c:set var="projectName" value="<%=Constants.MAP_PARAM_PROJECT_NAME_KEY%>"/>
 <c:set var="onFailure" value="<%=Constants.MAP_PARAM_ON_FAILURE_KEY%>"/>
@@ -21,7 +22,8 @@
 <c:set var="buildVersion" value="<%=Constants.MAP_PARAM_BUILD_VERSION_KEY%>"/>
 <c:set var="buildURI" value="<%=Constants.MAP_PARAM_BUILD_URI_KEY%>"/>
 <c:set var="integrationName" value="<%=Constants.MAP_PARAM_INTEGRATION_NAME_KEY%>"/>
-    
+
+
 
 <l:settingsGroup title="SOOS SCA settings">
     <tr>
@@ -75,9 +77,6 @@
                 <props:textProperty name="${analysisResultMaxWait}" size="36" />
                 <span class="error" id="error_${analysisResultMaxWait}"></span>
             </div>
-            <div>
-                <label>Default: <strong>300</strong></label>
-            </div>
         </td>
     </tr>
     <tr>
@@ -87,8 +86,14 @@
                 <props:textProperty name="${resultPollingInterval}" size="36" />
                 <span class="error" id="error_${resultPollingInterval}"></span>
             </div>
-            <div>
-                <label>Default: <strong>10</strong></label>
+        </td>
+    </tr>
+    <tr>
+        <th><label for="${apiBaseURI}">API Base URL: </label></th>
+        <td>
+            <div class="posRel">
+                <props:textProperty name="${apiBaseURI}" size="36" />
+                <span class="error" id="error_${apiBaseURI}"></span>
             </div>
         </td>
     </tr>

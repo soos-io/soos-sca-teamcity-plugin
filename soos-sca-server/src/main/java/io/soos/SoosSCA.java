@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ObjectUtils;
 
 import io.soos.integration.commons.Constants;
@@ -44,36 +45,20 @@ public class SoosSCA extends RunType {
 
     @Override
     public Map<String, String> getDefaultRunnerProperties() {
-        return new HashMap<>();
+        Map<String, String> map = new HashMap<>();
+
+        map.put(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, String.valueOf(Constants.MIN_RECOMMENDED_ANALYSIS_RESULT_MAX_WAIT));
+        map.put(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, String.valueOf(Constants.MIN_ANALYSIS_RESULT_POLLING_INTERVAL));
+        map.put(Constants.MAP_PARAM_API_BASE_URI_KEY, Constants.SOOS_DEFAULT_API_URL);
+
+        return map;
     }
 
     @Override
     public PropertiesProcessor getRunnerPropertiesProcessor() {
         return properties -> {
-
+            List<InvalidProperty> list = Validation.validateParams(properties);
             describeParameters(properties);
-            List<InvalidProperty> list = new ArrayList<>();
-            final String projectName = properties.get(Constants.MAP_PARAM_PROJECT_NAME_KEY);
-            final String analysisResultMaxWait = properties.get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY);
-            final String analysisResultPollingInterval = properties.get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY);
-
-            if ( ObjectUtils.isEmpty(projectName) ) {
-                list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, ErrorMessage.SHOULD_NOT_BE_NULL));
-            }
-            
-            if( !ObjectUtils.isEmpty(projectName) && projectName.length() < 5){
-                list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, ErrorMessage.SHOULD_BE_MORE_THAN_5_CHARACTERS));
-            }
-
-            if( !ObjectUtils.isEmpty(analysisResultMaxWait) && !validateNumber(analysisResultMaxWait)){
-                list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, ErrorMessage.SHOULD_BE_A_NUMBER));
-            }
-            
-            if( !ObjectUtils.isEmpty(analysisResultPollingInterval) && !validateNumber(analysisResultPollingInterval)){
-                list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY , ErrorMessage.SHOULD_BE_A_NUMBER));
-            }
-        
-
             return list;
         };
         
@@ -97,26 +82,7 @@ public class SoosSCA extends RunType {
             listParams.add(param);
         });
 
-        final String resultMaxWait = parameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY);
-        final String resultPollingInterval = parameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY);
-    
-        if(ObjectUtils.isEmpty(resultMaxWait)){
-            listParams.add(String.valueOf(Constants.MIN_RECOMMENDED_ANALYSIS_RESULT_MAX_WAIT));
-        }
-        if(ObjectUtils.isEmpty(resultPollingInterval)){
-            listParams.add(String.valueOf(Constants.MIN_ANALYSIS_RESULT_POLLING_INTERVAL));
-        }
-    
         String stringParams = String.join(" - ", listParams.stream().filter(param -> !param.equals("default")).collect(Collectors.toList()));
         return "Parameters: ".concat(stringParams);
-    }
-
-    private Boolean validateNumber(String value) {
-        try {
-            Integer.parseInt(value);
-            return true;
-        } catch ( Exception e ){
-            return false;
-        }
     }
 }

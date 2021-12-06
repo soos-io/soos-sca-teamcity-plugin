@@ -2,8 +2,8 @@
 <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                   xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
   <info>
-    <name>soos-sca</name>
-    <display-name>Soos SCA Plugin</display-name>
+    <name>SOSO SCA</name>
+    <display-name>SOOS SCA</display-name>
     <version>1.0.0</version>
     <description>Scan your open source software for vulnerabilities and control the introduction of new dependencies</description>
     <download-url>https://github.com/soos-io/soos-sca-teamcity</download-url>
@@ -11,7 +11,7 @@
     <vendor>
       <name>soos.io</name>
       <url>https://soos.io/</url>
-      <logo>Plugin vendor logo URL</logo>
+      <logo>https://github.com/soos-io/soos-sca-teamcity/blob/main/assets/SOOS_logo.png</logo>
     </vendor>
   </info>
   <deployment use-separate-classloader="true"/>
