@@ -106,6 +106,7 @@ If you care about the result or want to break the build when issues occur, add a
 | Operating System | "Linux"  | System info regarding operating system, etc., alternatives: "Windows" - "MacOS" |
 | Analysis Res. Max Wait | 300  | Maximum seconds to wait for Analysis Result before exiting with error. |
 | Analysis Res. Polling Interval | 10  | Polling interval (in seconds) for analysis result completion (success/failure.). Min 10. |
+| API Base URL | "https://api.soos.io/api/"  | The API BASE URI provided to you when subscribing to SOOS services. |
 | Directories To Exclude | ""  | List (comma separated) of directories (relative to ./) to exclude from the search for manifest files. Example - Correct: bin/start/ ... Example - Incorrect: ./bin/start/ ... Example - Incorrect: /bin/start/'|
 | Files To Exclude | ""  | List (comma separated) of files (relative to ./) to exclude from the search for manifest files. Example - Correct: bin/start/manifest.txt ... Example - Incorrect: ./bin/start/manifest.txt ... Example - Incorrect: /bin/start/manifest.txt' |
 | Commit Hash | ""  | The commit hash value from the SCM System |
