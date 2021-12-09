@@ -60,7 +60,7 @@ public class SoosSCAService extends BuildServiceAdapter {
                     case RUN_AND_WAIT:
                         LOG.info(PluginConstants.RUN_AND_WAIT_MODE_SELECTED);
                         startAnalysis(soos);
-                        getResult(soos);
+                        processResult(soos);
                         break;
                     case ASYNC_INIT:
                         LOG.info(PluginConstants.ASYNC_INIT_MODE_SELECTED);
@@ -68,7 +68,7 @@ public class SoosSCAService extends BuildServiceAdapter {
                         break;
                     case ASYNC_RESULT:
                         LOG.info(PluginConstants.ASYNC_RESULT_MODE_SELECTED);
-                        getResult(soos);
+                        processResult(soos);
                         break;
                 }
 
@@ -111,7 +111,7 @@ public class SoosSCAService extends BuildServiceAdapter {
         soos.startAnalysis(structure.getProjectId(), structure.getAnalysisId());
     }
 
-    private void getResult(SOOS soos) throws Exception {
+    private void processResult(SOOS soos) throws Exception {
         StructureResponse structure = soos.getStructure();
         soos.getResults(structure.getReportStatusUrl());
     }

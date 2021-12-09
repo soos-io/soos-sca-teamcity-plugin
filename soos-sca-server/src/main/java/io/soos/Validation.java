@@ -27,17 +27,16 @@ public class Validation {
 
         if ( ObjectUtils.isEmpty(projectName) ) {
             list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, ErrorMessage.SHOULD_NOT_BE_NULL));
-        }
-
-        if( !ObjectUtils.isEmpty(projectName) && projectName.length() < PluginConstants.MIN_NUMBER_OF_CHARACTERS){
+        } else if( projectName.length() < PluginConstants.MIN_NUMBER_OF_CHARACTERS ){
             list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, ErrorMessage.shouldBeMoreThanXCharacters(PluginConstants.MIN_NUMBER_OF_CHARACTERS)));
         }
 
-        if( validateIsNotEmptyAndIsNumeric(analysisResultMaxWait) ){
+
+        if( !validateIsNumeric(analysisResultMaxWait) ){
             list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, ErrorMessage.SHOULD_BE_A_NUMBER));
         }
 
-        if( validateIsNotEmptyAndIsNumeric(analysisResultPollingInterval) ){
+        if( !validateIsNumeric(analysisResultPollingInterval) ){
             list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY , ErrorMessage.SHOULD_BE_A_NUMBER));
         }
 
@@ -53,7 +52,12 @@ public class Validation {
         return list;
     }
 
-    private static Boolean validateIsNotEmptyAndIsNumeric( String value ) {
-        return !ObjectUtils.isEmpty(value) && !StringUtils.isNumeric(value);
+    private static Boolean validateIsNumeric( String value ) {
+        try {
+            return !StringUtils.isNumeric(value);
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
     }
 }

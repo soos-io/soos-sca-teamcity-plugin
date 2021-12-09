@@ -61,7 +61,7 @@ public class SoosSCA extends RunType {
             describeParameters(properties);
             return list;
         };
-        
+
     }
     @Override
     public String getEditRunnerParamsJspFilePath() {
@@ -83,6 +83,7 @@ public class SoosSCA extends RunType {
         });
 
         String stringParams = String.join(" - ", listParams.stream().filter(param -> !param.equals("default")).collect(Collectors.toList()));
-        return "Parameters: ".concat(stringParams);
+        StringBuilder parametersSB = new StringBuilder("Parameters: ").append(stringParams);
+        return parametersSB.toString();
     }
 }
