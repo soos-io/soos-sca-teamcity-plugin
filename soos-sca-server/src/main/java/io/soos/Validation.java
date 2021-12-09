@@ -54,7 +54,7 @@ public class Validation {
 
     private static Boolean validateIsNumeric( String value ) {
         try {
-            return !StringUtils.isNumeric(value);
+            return StringUtils.isNumeric(value);
         } catch (Exception e) {
             System.out.println(e);
             return false;
