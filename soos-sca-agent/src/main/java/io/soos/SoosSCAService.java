@@ -2,12 +2,7 @@ package io.soos;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 import io.soos.integration.domain.Mode;
@@ -45,7 +40,7 @@ public class SoosSCAService extends BuildServiceAdapter {
         try {
 
             SOOS soos = new SOOS();
-
+            soos.getContext().setScriptVersion(getVersionFromProperties());
             StructureResponse structure = soos.getStructure();
             LOG.info(structure.toString());
 
@@ -59,16 +54,16 @@ public class SoosSCAService extends BuildServiceAdapter {
                 switch ( mode ) {
                     case RUN_AND_WAIT:
                         LOG.info(PluginConstants.RUN_AND_WAIT_MODE_SELECTED);
-                        startAnalysis(soos);
-                        processResult(soos);
+                        startAnalysis(soos, structure);
+                        processResult(soos, structure);
                         break;
                     case ASYNC_INIT:
                         LOG.info(PluginConstants.ASYNC_INIT_MODE_SELECTED);
-                        startAnalysis(soos);
+                        startAnalysis(soos, structure);
                         break;
                     case ASYNC_RESULT:
                         LOG.info(PluginConstants.ASYNC_RESULT_MODE_SELECTED);
-                        processResult(soos);
+                        processResult(soos, structure);
                         break;
                 }
 
@@ -106,13 +101,11 @@ public class SoosSCAService extends BuildServiceAdapter {
         return new SimpleProgramCommandLine(getRunnerContext(), script, Collections.emptyList());
     }
 
-    private void startAnalysis(SOOS soos) throws Exception {
-        StructureResponse structure = soos.getStructure();
+    private void startAnalysis(SOOS soos, StructureResponse structure) throws Exception {
         soos.startAnalysis(structure.getProjectId(), structure.getAnalysisId());
     }
 
-    private void processResult(SOOS soos) throws Exception {
-        StructureResponse structure = soos.getStructure();
+    private void processResult(SOOS soos, StructureResponse structure) throws Exception {
         soos.getResults(structure.getReportStatusUrl());
     }
 
@@ -204,6 +197,17 @@ public class SoosSCAService extends BuildServiceAdapter {
         } 
         
         return PluginConstants.SOOS_DIR_NAME;
+    }
+
+    private String getVersionFromProperties(){
+        Properties prop = new Properties();
+        try {
+            prop.load(this.getClass().getResourceAsStream(PluginConstants.PROPERTIES_FILE));
+        } catch (IOException e) {
+            StringBuilder error = new StringBuilder("Cannot read file ").append("'").append(PluginConstants.PROPERTIES_FILE).append("' - ").append(e);
+            LOG.severe(error.toString());
+        }
+        return prop.getProperty(PluginConstants.VERSION);
     }
 
 }
