@@ -42,7 +42,6 @@ public class SoosSCAService extends BuildServiceAdapter {
             SOOS soos = new SOOS();
             soos.getContext().setScriptVersion(getVersionFromProperties());
             StructureResponse structure = soos.getStructure();
-            LOG.info(structure.toString());
 
             long filesProcessed = soos.sendManifestFiles(structure.getProjectId(), structure.getAnalysisId());
             StringBuilder fileProcessed = new StringBuilder("File processed: ").append(String.valueOf(filesProcessed));
@@ -203,11 +202,12 @@ public class SoosSCAService extends BuildServiceAdapter {
         Properties prop = new Properties();
         try {
             prop.load(this.getClass().getResourceAsStream(PluginConstants.PROPERTIES_FILE));
+            return prop.getProperty(PluginConstants.VERSION);
         } catch (IOException e) {
             StringBuilder error = new StringBuilder("Cannot read file ").append("'").append(PluginConstants.PROPERTIES_FILE).append("' - ").append(e);
             LOG.severe(error.toString());
         }
-        return prop.getProperty(PluginConstants.VERSION);
+        return null;
     }
 
 }
