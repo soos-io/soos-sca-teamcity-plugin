@@ -4,7 +4,7 @@
   <parent>
     <artifactId>soos-sca</artifactId>
     <groupId>io.soos</groupId>
-    <version>1.0.0</version>
+    <version>1.0.0-alpha.1</version>
   </parent>
   <artifactId>soos-sca-agent</artifactId>
   <packaging>jar</packaging>
@@ -13,7 +13,7 @@
     <dependency>
       <groupId>io.soos</groupId>
       <artifactId>soos-sca-common</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.0-alpha.1</version>
       <scope>compile</scope>
     </dependency>
 
