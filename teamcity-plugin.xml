@@ -2,9 +2,9 @@
 <teamcity-plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
                   xsi:noNamespaceSchemaLocation="urn:schemas-jetbrains-com:teamcity-plugin-v1-xml">
   <info>
-    <name>SOSO SCA</name>
+    <name>SOOS SCA</name>
     <display-name>SOOS SCA</display-name>
-    <version>1.0.0-alpha.1</version>
+    <version>1.0.0</version>
     <description>Scan your open source software for vulnerabilities and control the introduction of new dependencies</description>
     <download-url>https://github.com/soos-io/soos-sca-teamcity</download-url>
     <email>support@soos.io</email>
