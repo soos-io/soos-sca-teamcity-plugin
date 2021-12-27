@@ -6,11 +6,11 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import io.soos.integration.domain.Mode;
+import io.soos.integration.validators.OSValidator;
 import org.apache.commons.lang3.StringUtils;
 
 import io.soos.integration.commons.Constants;
 import io.soos.integration.domain.SOOS;
-import io.soos.integration.domain.analysis.AnalysisResultResponse;
 import io.soos.integration.domain.structure.StructureResponse;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
@@ -44,7 +44,7 @@ public class SoosSCAService extends BuildServiceAdapter {
             StructureResponse structure = soos.getStructure();
 
             long filesProcessed = soos.sendManifestFiles(structure.getProjectId(), structure.getAnalysisId());
-            StringBuilder fileProcessed = new StringBuilder("File processed: ").append(String.valueOf(filesProcessed));
+            StringBuilder fileProcessed = new StringBuilder("File processed: ").append(filesProcessed);
             LOG.info(fileProcessed.toString());
 
             mode = soos.getMode();
@@ -70,33 +70,20 @@ public class SoosSCAService extends BuildServiceAdapter {
 
         } catch (Exception e) {
             LOG.severe(e.toString());
-            StringBuilder errorMsg = new StringBuilder("SOOS SCA cannot be done, error: ").append(e.toString());
-
-            RunBuildException exception = new RunBuildException(errorMsg.toString());
-            exception.setLogStacktrace(false);
+            StringBuilder errorMsg = new StringBuilder("SOOS SCA cannot be done, error: ").append(e);
             if(onFailure.equals(PluginConstants.FAIL_THE_BUILD)){
+                RunBuildException exception = new RunBuildException(errorMsg.toString());
+                exception.setLogStacktrace(false);
                 throw exception;
             } else {
-                return new SimpleProgramCommandLine(getRunnerContext(), "/bin/echo", Arrays.asList(new String[]{exception.toString()}));
+                final String script = getCustomScript(errorMsg.toString());
+                setExecutableAttribute(script);
+                return new SimpleProgramCommandLine(getRunnerContext(), PluginConstants.ECHO_COMMAND, List.of(errorMsg.toString()));
             }
         }
-
-        StringBuilder scriptContent = new StringBuilder();
-        if( !mode.equals(Mode.ASYNC_INIT)){
-            if( mode.equals(Mode.RUN_AND_WAIT) ){
-                scriptContent.append("/bin/echo '").append(PluginConstants.RUN_AND_WAIT_MODE_SELECTED).append("'\n");
-            } else {
-                scriptContent.append("/bin/echo '").append(PluginConstants.ASYNC_RESULT_MODE_SELECTED).append("'\n");
-            }
-            scriptContent.append("/bin/echo 'Open the following url to see the report: ").append(reportUrl).append("'");
-        } else {
-            scriptContent.append("/bin/echo '").append(PluginConstants.ASYNC_INIT_MODE_SELECTED).append("'");
-        }
-
+        StringBuilder scriptContent = createScriptContent(mode, reportUrl);
         final String script = getCustomScript(scriptContent.toString());
-
         setExecutableAttribute(script);
-
         return new SimpleProgramCommandLine(getRunnerContext(), script, Collections.emptyList());
     }
 
@@ -165,7 +152,7 @@ public class SoosSCAService extends BuildServiceAdapter {
 
     private String getCustomScript(String scriptContent) throws RunBuildException {
         try {
-            final File scriptFile = File.createTempFile("custom_script", ".sh", getAgentTempDirectory());
+            final File scriptFile = createScriptFile();
             FileUtil.writeFileAndReportErrors(scriptFile, scriptContent);
             myFilesToDelete.add(scriptFile);
             return scriptFile.getAbsolutePath();
@@ -210,4 +197,29 @@ public class SoosSCAService extends BuildServiceAdapter {
         return null;
     }
 
+    private File createScriptFile() throws IOException {
+
+        File scriptFile;
+        if( OSValidator.isWindows() ) {
+             scriptFile = File.createTempFile(PluginConstants.CUSTOM_SCRIPT, PluginConstants.WIN_SCRIPT_EXT, getAgentTempDirectory());
+             return scriptFile;
+        }
+        scriptFile = File.createTempFile(PluginConstants.CUSTOM_SCRIPT, PluginConstants.UNIX_SCRIPT_EXT, getAgentTempDirectory());
+        return scriptFile;
+    }
+
+    private StringBuilder createScriptContent(Mode mode, String reportUrl) {
+        StringBuilder scriptContent = new StringBuilder();
+        if( !mode.equals(Mode.ASYNC_INIT)){
+            if( mode.equals(Mode.RUN_AND_WAIT) ){
+                scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.RUN_AND_WAIT_MODE_SELECTED).append("'\n");
+            } else {
+                scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_RESULT_MODE_SELECTED).append("'\n");
+            }
+            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" 'Open the following url to see the report: ").append(reportUrl).append("'");
+        } else {
+            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_INIT_MODE_SELECTED).append("'");
+        }
+        return scriptContent;
+    }
 }

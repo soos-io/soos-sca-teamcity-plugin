@@ -21,4 +21,9 @@ public interface PluginConstants {
     Integer MIN_NUMBER_OF_CHARACTERS = 5;
     String PROPERTIES_FILE = "/teamcity.properties";
     String VERSION = "version";
+    String ECHO_COMMAND = "echo";
+    /*String UNIX_ECHO_COMMAND = "/bin/echo";*/
+    String CUSTOM_SCRIPT = "custom_script";
+    String WIN_SCRIPT_EXT = ".bat";
+    String UNIX_SCRIPT_EXT = ".sh";
 }
