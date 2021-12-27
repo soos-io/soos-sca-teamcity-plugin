@@ -76,15 +76,69 @@ public class SoosSCAService extends BuildServiceAdapter {
                 exception.setLogStacktrace(false);
                 throw exception;
             } else {
-                final String script = getCustomScript(errorMsg.toString());
-                setExecutableAttribute(script);
-                return new SimpleProgramCommandLine(getRunnerContext(), PluginConstants.ECHO_COMMAND, List.of(errorMsg.toString()));
+                errorMsg = new StringBuilder(PluginConstants.ECHO_COMMAND).append(" '").append(errorMsg).append("'");
+                return getSimpleCommandLine(errorMsg);
             }
         }
         StringBuilder scriptContent = createScriptContent(mode, reportUrl);
+        return getSimpleCommandLine(scriptContent);
+    }
+
+    private SimpleProgramCommandLine getSimpleCommandLine(StringBuilder scriptContent) throws RunBuildException {
         final String script = getCustomScript(scriptContent.toString());
         setExecutableAttribute(script);
         return new SimpleProgramCommandLine(getRunnerContext(), script, Collections.emptyList());
+    }
+
+    private void setExecutableAttribute(String script) throws RunBuildException {
+        try {
+            TCStreamUtil.setFileMode(new File(script), PluginConstants.FILE_MODE);
+        } catch ( Throwable t ){
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Failed to set executable attribute for custom script '").append(script).append("'");
+            throw new RunBuildException(errorMsg.toString(), t);
+        }
+    }
+
+    private String getCustomScript(String scriptContent) throws RunBuildException {
+        try {
+            final File scriptFile = createScriptFile();
+            FileUtil.writeFileAndReportErrors(scriptFile, scriptContent);
+            myFilesToDelete.add(scriptFile);
+            return scriptFile.getAbsolutePath();
+        } catch ( IOException e ) {
+            StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("Failed to create temporary custom script in directory: ").append(getAgentTempDirectory());
+            RunBuildException exception = new RunBuildException(errorMsg.toString(), e);
+            exception.setLogStacktrace(false);
+            throw exception;
+        }
+    }
+
+    private File createScriptFile() throws IOException {
+
+        File scriptFile;
+        if( OSValidator.isWindows() ) {
+             scriptFile = File.createTempFile(PluginConstants.CUSTOM_SCRIPT, PluginConstants.WIN_SCRIPT_EXT, getAgentTempDirectory());
+             return scriptFile;
+        }
+        scriptFile = File.createTempFile(PluginConstants.CUSTOM_SCRIPT, PluginConstants.UNIX_SCRIPT_EXT, getAgentTempDirectory());
+        return scriptFile;
+    }
+
+    private StringBuilder createScriptContent(Mode mode, String reportUrl) {
+        StringBuilder scriptContent = new StringBuilder();
+        if( !mode.equals(Mode.ASYNC_INIT)){
+            if( mode.equals(Mode.RUN_AND_WAIT) ){
+                scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.RUN_AND_WAIT_MODE_SELECTED).append("'\n");
+            } else {
+                scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_RESULT_MODE_SELECTED).append("'\n");
+            }
+            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" 'Open the following url to see the report: ").append(reportUrl).append("'");
+        } else {
+            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_INIT_MODE_SELECTED).append("'");
+        }
+        return scriptContent;
     }
 
     private void startAnalysis(SOOS soos, StructureResponse structure) throws Exception {
@@ -140,31 +194,6 @@ public class SoosSCAService extends BuildServiceAdapter {
 
     }
 
-    private void setExecutableAttribute(String script) throws RunBuildException {
-        try {
-            TCStreamUtil.setFileMode(new File(script), PluginConstants.FILE_MODE);
-        } catch ( Throwable t ){
-            StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("Failed to set executable attribute for custom script '").append(script).append("'");
-            throw new RunBuildException(errorMsg.toString(), t);
-        }
-    }
-
-    private String getCustomScript(String scriptContent) throws RunBuildException {
-        try {
-            final File scriptFile = createScriptFile();
-            FileUtil.writeFileAndReportErrors(scriptFile, scriptContent);
-            myFilesToDelete.add(scriptFile);
-            return scriptFile.getAbsolutePath();
-        } catch ( IOException e ) {
-            StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("Failed to create temporary custom script in directory: ").append(getAgentTempDirectory());
-            RunBuildException exception = new RunBuildException(errorMsg.toString(), e);
-            exception.setLogStacktrace(false);
-            throw exception;
-        }
-    }
-
     @Override
     public void afterProcessFinished() throws RunBuildException {
         super.afterProcessFinished();
@@ -195,31 +224,5 @@ public class SoosSCAService extends BuildServiceAdapter {
             LOG.severe(error.toString());
         }
         return null;
-    }
-
-    private File createScriptFile() throws IOException {
-
-        File scriptFile;
-        if( OSValidator.isWindows() ) {
-             scriptFile = File.createTempFile(PluginConstants.CUSTOM_SCRIPT, PluginConstants.WIN_SCRIPT_EXT, getAgentTempDirectory());
-             return scriptFile;
-        }
-        scriptFile = File.createTempFile(PluginConstants.CUSTOM_SCRIPT, PluginConstants.UNIX_SCRIPT_EXT, getAgentTempDirectory());
-        return scriptFile;
-    }
-
-    private StringBuilder createScriptContent(Mode mode, String reportUrl) {
-        StringBuilder scriptContent = new StringBuilder();
-        if( !mode.equals(Mode.ASYNC_INIT)){
-            if( mode.equals(Mode.RUN_AND_WAIT) ){
-                scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.RUN_AND_WAIT_MODE_SELECTED).append("'\n");
-            } else {
-                scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_RESULT_MODE_SELECTED).append("'\n");
-            }
-            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" 'Open the following url to see the report: ").append(reportUrl).append("'");
-        } else {
-            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_INIT_MODE_SELECTED).append("'");
-        }
-        return scriptContent;
     }
 }
