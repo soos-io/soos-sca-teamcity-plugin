@@ -6,16 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.ObjectUtils;
-
 import io.soos.integration.commons.Constants;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import jetbrains.buildServer.serverSide.PropertiesProcessor;
 import jetbrains.buildServer.serverSide.RunType;
 import jetbrains.buildServer.serverSide.RunTypeRegistry;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
+import org.apache.commons.lang3.ObjectUtils;
 
 
 public class SoosSCA extends RunType {
@@ -75,15 +72,26 @@ public class SoosSCA extends RunType {
 
     @Override
     public String describeParameters(Map<String, String> parameters) {
-
-        List<String> listParams = new ArrayList<>();
-        
+        List<String> list = new ArrayList<>();
         parameters.forEach((key, param) -> {
-            listParams.add(param);
+            list.add(param);
         });
-
-        String stringParams = String.join(" - ", listParams.stream().filter(param -> !param.equals("default")).collect(Collectors.toList()));
-        StringBuilder parametersSB = new StringBuilder("Parameters: ").append(stringParams);
+        List<String> listParams;
+        if ( !ObjectUtils.isEmpty(parameters.get(PluginConstants.REPORT_STATUS_URL)) ) {
+            listParams = filterListParams(list, new String[]{ PluginConstants.DEFAULT, PluginConstants.STATUS });
+            listParams.add(PluginConstants.REPORT_STATUS_URL);
+        } else {
+            listParams = filterListParams(list, new String[]{ PluginConstants.DEFAULT });
+        }
+        String stringParams = String.join(PluginConstants.DELIMITER_HYPHEN, listParams);
+        StringBuilder parametersSB = new StringBuilder(PluginConstants.PARAMETERS).append(stringParams);
         return parametersSB.toString();
+    }
+
+    private List<String> filterListParams(List<String> list, String[] values) {
+        for (String value : values) {
+            list = list.stream().filter(param -> !param.contains(value)).collect(Collectors.toList());
+        }
+        return list;
     }
 }

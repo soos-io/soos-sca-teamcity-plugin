@@ -1,6 +1,7 @@
 package io.soos;
 
 import io.soos.integration.commons.Constants;
+import io.soos.integration.domain.Mode;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,8 @@ public class Validation {
     private static String analysisResultMaxWait;
     private static String analysisResultPollingInterval;
     private static String apiBaseURI;
+    private static String reportStatusUrl;
+    private static String mode;
 
     public Validation(){};
 
@@ -24,6 +27,8 @@ public class Validation {
         analysisResultMaxWait = properties.get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY);
         analysisResultPollingInterval = properties.get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY);
         apiBaseURI = properties.get(Constants.MAP_PARAM_API_BASE_URI_KEY);
+        reportStatusUrl = properties.get(PluginConstants.REPORT_STATUS_URL);
+        mode = properties.get(Constants.MAP_PARAM_MODE_KEY);
 
         if ( ObjectUtils.isEmpty(projectName) ) {
             list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, ErrorMessage.SHOULD_NOT_BE_NULL));
@@ -31,6 +36,9 @@ public class Validation {
             list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, ErrorMessage.shouldBeMoreThanXCharacters(PluginConstants.MIN_NUMBER_OF_CHARACTERS)));
         }
 
+        if ( StringUtils.equals(mode, Mode.ASYNC_RESULT.getMode()) && ObjectUtils.isEmpty(reportStatusUrl) ) {
+            list.add(new InvalidProperty(PluginConstants.REPORT_STATUS_URL, ErrorMessage.SHOULD_NOT_BE_NULL));
+        }
 
         if( !validateIsNumeric(analysisResultMaxWait) ){
             list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, ErrorMessage.SHOULD_BE_A_NUMBER));

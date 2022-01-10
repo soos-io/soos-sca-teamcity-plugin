@@ -4,16 +4,20 @@
   <parent>
     <artifactId>soos-sca</artifactId>
     <groupId>io.soos</groupId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
   </parent>
   <artifactId>soos-sca-server</artifactId>
   <packaging>jar</packaging>
+  <properties>
+    <soos-sca.version>1.0.5</soos-sca.version>
+  </properties>
+
   <dependencies>
 
     <dependency>
       <groupId>io.soos</groupId>
       <artifactId>soos-sca-common</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.3</version>
       <scope>compile</scope>
     </dependency>
 
@@ -42,9 +46,8 @@
     <dependency>
       <groupId>io.soos</groupId>
       <artifactId>sca</artifactId>
-      <version>1.0.4</version>
+      <version>${soos-sca.version}</version>
     </dependency>
-
   </dependencies>
 
   <build>

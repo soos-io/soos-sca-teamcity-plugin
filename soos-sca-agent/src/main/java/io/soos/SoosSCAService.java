@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import io.soos.integration.domain.Mode;
+import io.soos.integration.domain.analysis.AnalysisResultResponse;
 import io.soos.integration.validators.OSValidator;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,13 +19,16 @@ import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.agent.runner.SimpleProgramCommandLine;
 import jetbrains.buildServer.util.FileUtil;
 import jetbrains.buildServer.util.TCStreamUtil;
+import org.jetbrains.annotations.NotNull;
 
 
 public class SoosSCAService extends BuildServiceAdapter {
+
+
+    private final Set<File> myFilesToDelete = new HashSet<>();
+    private static final Logger LOG = Logger.getLogger(SoosSCAService.class.getName());
     
-    private final Set<File> myFilesToDelete = new HashSet<File>();
-    private static Logger LOG = Logger.getLogger(SoosSCAService.class.getName());
-    
+    @NotNull
     @Override
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
 
@@ -34,40 +38,48 @@ public class SoosSCAService extends BuildServiceAdapter {
         setEnvProperties(map);
 
         String onFailure = getRunnerParameters().get(Constants.MAP_PARAM_ON_FAILURE_KEY);
-
-        String reportUrl = "";
+        String reportStatusUrl = getRunnerParameters().get(PluginConstants.REPORT_STATUS_URL);
+        String result = "";
         Mode mode;
         try {
-
             SOOS soos = new SOOS();
             soos.getContext().setScriptVersion(getVersionFromProperties());
-            StructureResponse structure = soos.getStructure();
-
-            long filesProcessed = soos.sendManifestFiles(structure.getProjectId(), structure.getAnalysisId());
-            StringBuilder fileProcessed = new StringBuilder("File processed: ").append(filesProcessed);
-            LOG.info(fileProcessed.toString());
-
+            StructureResponse structure = null;
+            AnalysisResultResponse analysisResultResponse = null;
             mode = soos.getMode();
-            if(filesProcessed > 0) {
-                reportUrl = structure.getReportURL();
-                switch ( mode ) {
-                    case RUN_AND_WAIT:
-                        LOG.info(PluginConstants.RUN_AND_WAIT_MODE_SELECTED);
-                        startAnalysis(soos, structure);
-                        processResult(soos, structure);
-                        break;
-                    case ASYNC_INIT:
-                        LOG.info(PluginConstants.ASYNC_INIT_MODE_SELECTED);
-                        startAnalysis(soos, structure);
-                        break;
-                    case ASYNC_RESULT:
-                        LOG.info(PluginConstants.ASYNC_RESULT_MODE_SELECTED);
-                        processResult(soos, structure);
-                        break;
-                }
-
+            LOG.info("--------------------------------------------");
+            switch ( mode ) {
+                case RUN_AND_WAIT:
+                    LOG.info(PluginConstants.RUN_AND_WAIT_MODE_SELECTED);
+                    LOG.info("Run and Wait Scan");
+                    LOG.info("--------------------------------------------");
+                    LOG.info("Analysis request is running");
+                    structure = soos.startAnalysis();
+                    analysisResultResponse = soos.getResults(structure.getReportStatusUrl());
+                    result= analysisResultResponse.getReportUrl();
+                    LOG.info("Scan analysis finished successfully. To see the results go to: " + result);
+                    break;
+                case ASYNC_INIT:
+                    LOG.info(PluginConstants.ASYNC_INIT_MODE_SELECTED);
+                    LOG.info("Async Init Scan");
+                    LOG.info("--------------------------------------------");
+                    structure = soos.startAnalysis();
+                    result = structure.getReportStatusUrl();
+                    LOG.info("reportStatusUrl from envs: " + map.get(PluginConstants.REPORT_STATUS_URL));
+                    LOG.info("Analysis request is running, access the report status using this link: " + result);
+                    break;
+                case ASYNC_RESULT:
+                    LOG.info(PluginConstants.ASYNC_RESULT_MODE_SELECTED);
+                    LOG.info("Async Result Scan");
+                    LOG.info("--------------------------------------------");
+                    LOG.info("Checking Scan Status from: {}"+ reportStatusUrl);
+                    analysisResultResponse = soos.getResults(reportStatusUrl);
+                    result = analysisResultResponse.getReportUrl();
+                    LOG.info("Scan analysis finished successfully. To see the results go to: " + result);
+                    break;
+                default:
+                    throw new Exception("Invalid SCA Mode");
             }
-
         } catch (Exception e) {
             LOG.severe(e.toString());
             StringBuilder errorMsg = new StringBuilder("SOOS SCA cannot be done, error: ").append(e);
@@ -80,7 +92,7 @@ public class SoosSCAService extends BuildServiceAdapter {
                 return getSimpleCommandLine(errorMsg);
             }
         }
-        StringBuilder scriptContent = createScriptContent(mode, reportUrl);
+        StringBuilder scriptContent = createScriptContent(mode, result);
         return getSimpleCommandLine(scriptContent);
     }
 
@@ -126,7 +138,7 @@ public class SoosSCAService extends BuildServiceAdapter {
         return scriptFile;
     }
 
-    private StringBuilder createScriptContent(Mode mode, String reportUrl) {
+    private StringBuilder createScriptContent(Mode mode, String result) {
         StringBuilder scriptContent = new StringBuilder();
         if( !mode.equals(Mode.ASYNC_INIT)){
             if( mode.equals(Mode.RUN_AND_WAIT) ){
@@ -134,19 +146,12 @@ public class SoosSCAService extends BuildServiceAdapter {
             } else {
                 scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_RESULT_MODE_SELECTED).append("'\n");
             }
-            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" 'Open the following url to see the report: ").append(reportUrl).append("'");
+            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" 'Open the following url to see the report: ").append(result).append("'");
         } else {
-            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_INIT_MODE_SELECTED).append("'");
+            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_INIT_MODE_SELECTED).append("'\n");
+            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" 'Copy the following url and use it when your select the Async result mode: ").append(result).append("'");
         }
         return scriptContent;
-    }
-
-    private void startAnalysis(SOOS soos, StructureResponse structure) throws Exception {
-        soos.startAnalysis(structure.getProjectId(), structure.getAnalysisId());
-    }
-
-    private void processResult(SOOS soos, StructureResponse structure) throws Exception {
-        soos.getResults(structure.getReportStatusUrl());
     }
 
     private Map<String, String> populateContext(Map<String, String> runnerParameters) {
@@ -173,6 +178,7 @@ public class SoosSCAService extends BuildServiceAdapter {
         map.put(Constants.PARAM_INTEGRATION_NAME_KEY, PluginConstants.INTEGRATION_NAME);
         map.put(Constants.SOOS_CLIENT_ID, getSystemProperties().get(Constants.SOOS_CLIENT_ID));
         map.put(Constants.SOOS_API_KEY, getSystemProperties().get(Constants.SOOS_API_KEY));
+        map.put(PluginConstants.REPORT_STATUS_URL, getSystemProperties().get(PluginConstants.REPORT_STATUS_URL));
 
         if(StringUtils.isBlank(getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY))) {
             map.put(Constants.PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, String.valueOf(Constants.MIN_RECOMMENDED_ANALYSIS_RESULT_MAX_WAIT));

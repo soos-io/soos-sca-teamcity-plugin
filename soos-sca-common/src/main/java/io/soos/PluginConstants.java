@@ -1,9 +1,5 @@
 package io.soos;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public interface PluginConstants {
     String DISPLAY_NAME = "SOOS SCA";
     String DESCRIPTION = "Scan your open source software for vulnerabilities and control the introduction of new dependencies";
@@ -22,8 +18,12 @@ public interface PluginConstants {
     String PROPERTIES_FILE = "/teamcity.properties";
     String VERSION = "version";
     String ECHO_COMMAND = "echo";
-    /*String UNIX_ECHO_COMMAND = "/bin/echo";*/
     String CUSTOM_SCRIPT = "custom_script";
     String WIN_SCRIPT_EXT = ".bat";
     String UNIX_SCRIPT_EXT = ".sh";
+    String REPORT_STATUS_URL = "reportStatusUrl";
+    String STATUS = "status";
+    String DEFAULT = "default";
+    String DELIMITER_HYPHEN = " - ";
+    String PARAMETERS = "Parameters: ";
 }

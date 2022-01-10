@@ -1,4 +1,6 @@
 <%@ page import="io.soos.integration.commons.Constants" %>
+<%@ page import="io.soos.PluginConstants" %>
+<%@ page import="io.soos.SoosSCA" %>
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 <%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
@@ -22,15 +24,22 @@
 <c:set var="buildVersion" value="<%=Constants.MAP_PARAM_BUILD_VERSION_KEY%>"/>
 <c:set var="buildURI" value="<%=Constants.MAP_PARAM_BUILD_URI_KEY%>"/>
 <c:set var="integrationName" value="<%=Constants.MAP_PARAM_INTEGRATION_NAME_KEY%>"/>
+<c:set var="reportStatusUrl" value="<%=PluginConstants.REPORT_STATUS_URL%>"/>
 
-
+<script type="text/javascript">
+    function sendModeAndCleanField(mode) {
+        if ( mode !== 'async_result') {
+            document.getElementById("reportStatusURL").value = '';
+        }
+    }
+</script>
 
 <l:settingsGroup title="SOOS SCA settings">
     <tr>
         <th><label for="${projectName}">Project Name: <l:star/></label></th>
         <td>
             <div class="posRel">
-                <props:textProperty name="${projectName}" size="36"/>
+                <props:textProperty id="projectName" name="${projectName}" size="36"/>
                 <span class="error" id="error_${projectName}"></span>
             </div>
         </td>
@@ -39,11 +48,20 @@
         <th><label for="${mode}">Mode: </label></th>
         <td>
             <div class="posRel">
-                <props:selectProperty name="${mode}">
+                <props:selectProperty name="${mode}" onchange="sendModeAndCleanField(this.value)">
                     <props:option value="run_and_wait">Run and wait</props:option>
                     <props:option value="async_init">Async init</props:option>
                     <props:option value="async_result">Async result</props:option>
                 </props:selectProperty>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <th><label for="${reportStatusUrl}">Report Status URL: </label></th>
+        <td>
+            <div class="posRel">
+                <props:textProperty id="reportStatusURL" name="${reportStatusUrl}" size="90" />
+                <span class="error" id="error_${reportStatusUrl}"></span>
             </div>
         </td>
     </tr>
