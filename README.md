@@ -89,7 +89,7 @@ Set the **Mode** parameter to *Run and wait*, then you can run the plans in your
 Set the **Mode** parameter to *Async init*, if you don't care about the scan result in your CI/CD plan, this is all you have to do!
 
 #### Wait for the Scan
-If you care about the result or want to break the build when issues occur, add a second task close to the end of your plan to give the scan as much time as possible to complete, setting the **Mode** parameter to *Async result*.
+If you care about the result or want to break the build when issues occur, you **have to** copy the report status URL from the *Async init* mode response, and paste it when you set the **Mode** parameter to *Async result*.
 
 
 ### Configure other plugin parameters
@@ -102,6 +102,7 @@ If you care about the result or want to break the build when issues occur, add a
 | --- | --- | --- |
 | Project Name | ""  | REQUIRED. A custom project name that will present itself as a collection of test results within your soos.io dashboard. |
 | Mode | "Run and wait"  | Running mode, alternatives: "Async init" - "Async result" |
+| Report Status URL | "" | REQUIRED WHEN ASYNC RESULT SELECTED. Report status url from where to check the last successfully done "Async init" analysis |
 | On Failure | "Fail the build"  | Stop the building in case of failure, alternative: "Continue on failure" |
 | Operating System | "Linux"  | System info regarding operating system, etc., alternatives: "Windows" - "MacOS" |
 | Analysis Res. Max Wait | 300  | Maximum seconds to wait for Analysis Result before exiting with error. |
