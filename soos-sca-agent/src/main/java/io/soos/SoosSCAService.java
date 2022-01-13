@@ -152,6 +152,7 @@ public class SoosSCAService extends BuildServiceAdapter {
                 resultText = " Copy the following url and use it when your select the Async result mode: ";
                 scriptContent.append(createReportMsg(PluginConstants.ASYNC_INIT_MODE_SELECTED, resultText, result));
         }
+        scriptContent.append(" | tee result.txt");
         return scriptContent;
     }
 
