@@ -140,18 +140,30 @@ public class SoosSCAService extends BuildServiceAdapter {
 
     private StringBuilder createScriptContent(Mode mode, String result) {
         StringBuilder scriptContent = new StringBuilder();
-        if( !mode.equals(Mode.ASYNC_INIT)){
-            if( mode.equals(Mode.RUN_AND_WAIT) ){
-                scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.RUN_AND_WAIT_MODE_SELECTED).append("'\n");
-            } else {
-                scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_RESULT_MODE_SELECTED).append("'\n");
-            }
-            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" 'Open the following url to see the report: ").append(result).append("'");
-        } else {
-            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" '").append(PluginConstants.ASYNC_INIT_MODE_SELECTED).append("'\n");
-            scriptContent.append(PluginConstants.ECHO_COMMAND).append(" 'Copy the following url and use it when your select the Async result mode: ").append(result).append("'");
+        String resultText = " Open the following url to see the report: ";
+        switch ( mode ){
+            case RUN_AND_WAIT:
+                scriptContent.append(createReportMsg(PluginConstants.RUN_AND_WAIT_MODE_SELECTED, resultText, result));
+                break;
+            case ASYNC_RESULT:
+                scriptContent.append(createReportMsg(PluginConstants.ASYNC_RESULT_MODE_SELECTED, resultText, result));
+                break;
+            default:
+                resultText = " Copy the following url and use it when your select the Async result mode: ";
+                scriptContent.append(createReportMsg(PluginConstants.ASYNC_INIT_MODE_SELECTED, resultText, result));
         }
         return scriptContent;
+    }
+
+    private String createReportMsg(String selectedMode, String resultText, String result) {
+        StringBuilder msg = new StringBuilder();
+        msg.append(PluginConstants.ECHO_COMMAND)
+           .append(" ")
+           .append(selectedMode)
+           .append("\n")
+           .append(PluginConstants.ECHO_COMMAND).append(resultText)
+           .append(result);
+        return msg.toString();
     }
 
     private Map<String, String> populateContext(Map<String, String> runnerParameters) {
