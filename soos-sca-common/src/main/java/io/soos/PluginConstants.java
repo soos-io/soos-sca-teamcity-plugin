@@ -26,4 +26,28 @@ public interface PluginConstants {
     String DEFAULT = "default";
     String DELIMITER_HYPHEN = " - ";
     String PARAMETERS = "Parameters: ";
+    String SLASH = "/";
+    String BACK_SLASH = "\\";
+    String PIPE = " | ";
+    String TEE_COMMAND = "tee ";
+    String RESULT_FILE = "result.txt";
+    String TEAMCITY_DATA_PATH_ENV = "TEAMCITY_DATA_PATH";
+    String TEAMCITY_DATA_PATH = "teamcity.data.path";
+    String TEAMCITY_BUILD_ID = "teamcity.agent.dotnet.build_id";
+    String TEAMCITY_BUILD_TYPE_ID = "teamcity.buildType.id";
+    String TEAMCITY_BUILD_CONF_NAME = "teamcity.buildConfName";
+    String AGENT_HOME_DIR = "agent.home.dir";
+    String TEAMCITY_STARTUP_PROPERTIES_FILE = "teamcity-startup.properties";
+    String ARTIFACTS = "artifacts";
+    String SYSTEM = "system";
+    String CONFIG = "config";
+    String CONF = "conf";
+    String INTERNAL_PROPERTIES_FILE = "internal.properties";
+    String CONTENT_POLICY_PROPERTY = "teamcity.web.header.Content-Security-Policy.protectedValue";
+    String EQUAL = "=";
+    String IMG_SRC_POLICY = "img-src 'self' data: blob: ";
+    String SOOS_IMAGES_PRODUCTION_CDN = "http://cdn.mcauto-images-production.sendgrid.net/";
+    String GREATER_THAN = " > ";
+    String C_BACK_SLASH_COLON_DOUBLE_BACK_SLASH = "C\\:\\\\";
+    String C_COLON_BACK_SLASH = "C:\\";
 }
