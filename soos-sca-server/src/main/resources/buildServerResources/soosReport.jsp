@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<script>
+<script type="text/javascript">
     const copyToClipboard = url => {
         if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
             return navigator.clipboard.writeText(url);
@@ -8,7 +8,7 @@
             alert('The Clipboard API is not available, please copy the URL manually from here: ', url)
             return Promise.reject('The Clipboard API is not available.');
         }
-    };
+    }
 </script>
 
 <c:if test="${isSuccessful}">
@@ -33,3 +33,5 @@
     <a href="http://soos.io"><img class="max-width" style="margin-top:20px; display:block; color:#000000; text-decoration:none; font-family:Helvetica, arial, sans-serif; font-size:16px; max-width:100% !important; width:100%; height:auto !important;" width="600" alt="SOOS" data-proportionally-constrained="true" data-responsive="true" src="http://cdn.mcauto-images-production.sendgrid.net/ad9c1fd7de1b8c13/d64e5447-95c9-4fad-a923-4da272364360/848x161.png"></a>
     </div>
 </c:if>
+
+
