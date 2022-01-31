@@ -8,6 +8,7 @@ import io.soos.domain.TeamcityContext;
 import io.soos.integration.domain.Mode;
 import io.soos.integration.domain.analysis.AnalysisResultResponse;
 import io.soos.utils.Utils;
+import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -44,7 +45,6 @@ public class SoosSCAService extends BuildServiceAdapter {
         Map<String, String> map = new HashMap<>(populateContext(runnerParameters));
         setEnvProperties(map);
         String onFailure = getRunnerParameters().get(Constants.MAP_PARAM_ON_FAILURE_KEY);
-        String reportStatusUrl = getRunnerParameters().get(PluginConstants.REPORT_STATUS_URL);
         String result;
         Mode mode;
         try {
@@ -62,7 +62,7 @@ public class SoosSCAService extends BuildServiceAdapter {
                     LOG.info("Analysis request is running");
                     structure = soos.startAnalysis();
                     analysisResultResponse = soos.getResults(structure.getReportStatusUrl());
-                    result= analysisResultResponse.getReportUrl();
+                    result = analysisResultResponse.getReportUrl();
                     LOG.info("Scan analysis finished successfully. To see the results go to: " + result);
                     break;
                 case ASYNC_INIT:
@@ -71,10 +71,10 @@ public class SoosSCAService extends BuildServiceAdapter {
                     LOG.info("--------------------------------------------");
                     structure = soos.startAnalysis();
                     result = structure.getReportStatusUrl();
-                    LOG.info("reportStatusUrl from envs: " + map.get(PluginConstants.REPORT_STATUS_URL));
                     LOG.info("Analysis request is running, access the report status using this link: " + result);
                     break;
                 case ASYNC_RESULT:
+                    String reportStatusUrl = Utils.getReportStatusUrl(teamcityContext);
                     LOG.info(PluginConstants.ASYNC_RESULT_MODE_SELECTED);
                     LOG.info("Async Result Scan");
                     LOG.info("--------------------------------------------");
@@ -109,6 +109,19 @@ public class SoosSCAService extends BuildServiceAdapter {
     }
 
     private Map<String, String> populateContext(Map<String, String> runnerParameters) {
+        String branchUri = "";
+        String branchName = "";
+        String commitHash = getBuildParameters().getSystemProperties().get(PluginConstants.SYSTEM_BUILD_VCS_NUMBER);
+        String buildId = getBuildParameters().getSystemProperties().get(PluginConstants.SYSTEM_BUILD_NUMBER);
+
+        for (VcsRootEntry entry: getBuild().getVcsRootEntries()) {
+            branchUri = entry.getVcsRoot().getProperty(PluginConstants.URL);
+            branchName = entry.getVcsRoot().getProperty(PluginConstants.BRANCH);
+        }
+
+        String[] arr = branchName.split(PluginConstants.SLASH);
+        branchName = arr[arr.length - 1];
+
         Map<String, String> map = new HashMap<>();
         String dirsToExclude = addSoosDirToExclusion(runnerParameters.get(Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY));
         map.put(Constants.PARAM_PROJECT_NAME_KEY, runnerParameters.get(Constants.MAP_PARAM_PROJECT_NAME_KEY));
@@ -121,16 +134,15 @@ public class SoosSCAService extends BuildServiceAdapter {
         map.put(Constants.PARAM_API_BASE_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_API_BASE_URI_KEY));
         map.put(Constants.PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, runnerParameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY));
         map.put(Constants.PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, runnerParameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY));
-        map.put(Constants.PARAM_OPERATING_ENVIRONMENT_KEY, runnerParameters.get(Constants.MAP_PARAM_OPERATING_ENVIRONMENT_KEY));
-        map.put(Constants.PARAM_BRANCH_NAME_KEY, runnerParameters.get(Constants.MAP_PARAM_BRANCH_NAME_KEY));
-        map.put(Constants.PARAM_BRANCH_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_BRANCH_URI_KEY));
-        map.put(Constants.PARAM_COMMIT_HASH_KEY, runnerParameters.get(Constants.MAP_PARAM_COMMIT_HASH_KEY));
-        map.put(Constants.PARAM_BUILD_VERSION_KEY, runnerParameters.get(Constants.MAP_PARAM_BUILD_VERSION_KEY));
+        map.put(Constants.PARAM_OPERATING_ENVIRONMENT_KEY, Utils.getOperatingSystem());
+        map.put(Constants.PARAM_BRANCH_NAME_KEY, branchName);
+        map.put(Constants.PARAM_BRANCH_URI_KEY, branchUri);
+        map.put(Constants.PARAM_COMMIT_HASH_KEY, commitHash);
+        map.put(Constants.PARAM_BUILD_VERSION_KEY, buildId);
         map.put(Constants.PARAM_BUILD_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_BUILD_URI_KEY));
         map.put(Constants.PARAM_INTEGRATION_NAME_KEY, PluginConstants.INTEGRATION_NAME);
         map.put(Constants.SOOS_CLIENT_ID, getSystemProperties().get(Constants.SOOS_CLIENT_ID));
         map.put(Constants.SOOS_API_KEY, getSystemProperties().get(Constants.SOOS_API_KEY));
-        map.put(PluginConstants.REPORT_STATUS_URL, getSystemProperties().get(PluginConstants.REPORT_STATUS_URL));
 
         if(StringUtils.isBlank(getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY))) {
             map.put(Constants.PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, String.valueOf(Constants.MIN_RECOMMENDED_ANALYSIS_RESULT_MAX_WAIT));
@@ -142,13 +154,11 @@ public class SoosSCAService extends BuildServiceAdapter {
     }
 
     private void setEnvProperties(Map<String, String> map){
-
         map.forEach((key, value) -> {
             if(StringUtils.isNotBlank(value)) {
                 System.setProperty(key, value);
             }
         });
-
     }
 
     @Override

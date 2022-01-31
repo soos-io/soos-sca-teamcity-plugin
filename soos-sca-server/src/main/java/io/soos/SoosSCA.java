@@ -7,10 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import io.soos.integration.commons.Constants;
-import jetbrains.buildServer.federation.TeamCityServer;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
-import org.apache.commons.lang3.ObjectUtils;
 
 
 public class SoosSCA extends RunType {
@@ -73,22 +71,13 @@ public class SoosSCA extends RunType {
         parameters.forEach((key, param) -> {
             list.add(param);
         });
-        List<String> listParams;
-        if ( !ObjectUtils.isEmpty(parameters.get(PluginConstants.REPORT_STATUS_URL)) ) {
-            listParams = filterListParams(list, new String[]{ PluginConstants.DEFAULT, PluginConstants.STATUS });
-            listParams.add(PluginConstants.REPORT_STATUS_URL);
-        } else {
-            listParams = filterListParams(list, new String[]{ PluginConstants.DEFAULT });
-        }
+        List<String> listParams = filterListParams(list);
         String stringParams = String.join(PluginConstants.DELIMITER_HYPHEN, listParams);
         StringBuilder parametersSB = new StringBuilder(PluginConstants.PARAMETERS).append(stringParams);
         return parametersSB.toString();
     }
 
-    private List<String> filterListParams(List<String> list, String[] values) {
-        for (String value : values) {
-            list = list.stream().filter(param -> !param.contains(value)).collect(Collectors.toList());
-        }
-        return list;
+    private List<String> filterListParams(List<String> list) {
+        return list.stream().filter(param -> !param.contains(PluginConstants.DEFAULT)).collect(Collectors.toList());
     }
 }

@@ -1,9 +1,7 @@
 package io.soos.utils;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 import io.soos.PluginConstants;
@@ -154,7 +152,7 @@ public class Utils {
                 scriptContent.append(createReportMsg(PluginConstants.ASYNC_RESULT_MODE_SELECTED, resultText, result));
                 break;
             default:
-                resultText = " Copy the following url and use it when your select the Async result mode: ";
+                resultText = " Report status URL: ";
                 scriptContent.append(createReportMsg(PluginConstants.ASYNC_INIT_MODE_SELECTED, resultText, result));
         }
 
@@ -193,4 +191,70 @@ public class Utils {
         }
         myFilesToDelete.clear();
     }
+
+    public static String getOperatingSystem() {
+        return System.getProperty(PluginConstants.OS_NAME).toLowerCase();
+    }
+
+    public static String getReportStatusUrl(TeamcityContext teamcityContext) throws Exception {
+        StringBuilder actualPath = new StringBuilder(getBuildArtifactsDirectory(teamcityContext));
+        File buildsFolder = new File(actualPath.toString()).getParentFile();
+        File previousBuildFolder = getPreviousBuildFolder(buildsFolder);
+        StringBuilder resultFilePath;
+
+        if ( previousBuildFolder != null) {
+            resultFilePath = new StringBuilder(previousBuildFolder.getAbsolutePath());
+        } else {
+            throw new Exception("Cannot find the status url from the previous build");
+        }
+
+        LOG.info(resultFilePath.toString());
+        File file = new File(resultFilePath.toString());
+        String resultStatusUrl = "";
+        try {
+            Scanner scanner = new Scanner(file);
+            String data = scanner.nextLine();
+            String[] arr = data.split(": ");
+            resultStatusUrl = arr[1].trim();
+            scanner.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return resultStatusUrl;
+    }
+
+    public static File getPreviousBuildFolder(final File path) {
+        List<File> folders = Arrays.asList(path.listFiles());
+        Collections.sort(folders, (f1, f2) -> {
+            if (f1.isDirectory() && f2.isDirectory()) {
+                return Long.compare(f1.lastModified(),f2.lastModified());
+            }
+            return -1;
+        });
+        for (int i = folders.size() -1; i >= 0; i--) {
+            File file = folders.get(i);
+            if( file.isDirectory() && !file.getName().equals(".teamcity") ) {
+                File foundFile = getPreviousBuildFolder(file);
+                if (foundFile != null) {
+                    return foundFile;
+                }
+            } else if (file.getName().equals(PluginConstants.RESULT_FILE)){
+                try {
+                    Scanner scanner = new Scanner(file);
+                    String data = scanner.nextLine();
+                    if ( data.contains("Report status URL") ) {
+                        scanner.close();
+                        return file;
+                    } else {
+                        return null;
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
+    }
+
 }

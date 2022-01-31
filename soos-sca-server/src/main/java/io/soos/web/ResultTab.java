@@ -8,6 +8,7 @@ import jetbrains.buildServer.web.*;
 import jetbrains.buildServer.web.openapi.BuildTab;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.util.ObjectUtils;
 
@@ -29,17 +30,17 @@ public class ResultTab extends BuildTab {
 
     @Override
     protected void fillModel(@NotNull Map<String, Object> model, @NotNull SBuild build) {
-        boolean isSuccessful = build.getBuildStatus().isSuccessful();
+
         StringBuilder path = new StringBuilder(build.getArtifactsDirectory().getAbsolutePath());
-        path.append(PluginConstants.SLASH).append(PluginConstants.RESULT_FILE);
+        path.append(PluginConstants.SLASH);
+        path.append(PluginConstants.RESULT_FILE);
+
         File file = new File(path.toString());
         try {
             Scanner scanner = new Scanner(file);
-            StringBuilder data = new StringBuilder(scanner.nextLine());
-            String[] resultArray = data.toString().split(": ");
-            String url = resultArray[1];
-            model.put("isSuccessful", isSuccessful);
-            model.put("url", url);
+            String data = scanner.nextLine();
+            String[] arr = data.split(": ");
+            model.put("url", arr[1]);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
