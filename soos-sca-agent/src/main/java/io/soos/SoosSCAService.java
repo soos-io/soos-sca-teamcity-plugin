@@ -78,10 +78,10 @@ public class SoosSCAService extends BuildServiceAdapter {
                     LOG.info(PluginConstants.ASYNC_RESULT_MODE_SELECTED);
                     LOG.info("Async Result Scan");
                     LOG.info("--------------------------------------------");
-                    LOG.info("Checking Scan Status from: {}"+ reportStatusUrl);
+                    LOG.info("Checking Scan Status from: ".concat(reportStatusUrl));
                     analysisResultResponse = soos.getResults(reportStatusUrl);
                     result = analysisResultResponse.getReportUrl();
-                    LOG.info("Scan analysis finished successfully. To see the results go to: " + result);
+                    LOG.info("Scan analysis finished successfully. To see the results go to: ".concat(result));
                     break;
                 default:
                     throw new Exception("Invalid SCA Mode");

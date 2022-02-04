@@ -1,6 +1,9 @@
 package io.soos;
 
 public final class PluginConstants {
+
+    private PluginConstants() {}
+
     public static final String DISPLAY_NAME = "SOOS SCA";
     public static final String DESCRIPTION = "Scan your open source software for vulnerabilities and control the introduction of new dependencies";
     public static final String TYPE = "SOOS-SCA";
@@ -26,6 +29,8 @@ public final class PluginConstants {
     public static final String PARAMETERS = "Parameters: ";
     public static final String SLASH = "/";
     public static final String BACK_SLASH = "\\";
+    public static final String BLANK_SPACE = " ";
+    public static final String LINE_BREAK = "\n";
     public static final String PIPE = " | ";
     public static final String TEE_COMMAND = "tee ";
     public static final String RESULT_FILE = "result.txt";

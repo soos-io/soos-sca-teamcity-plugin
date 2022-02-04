@@ -41,15 +41,14 @@ public class Utils {
             while (reader.hasNextLine()) {
                 String line = reader.nextLine();
                 String firstChar = !line.isBlank() ? Character.toString(line.trim().charAt(0)) : "";
-                if ( !firstChar.equals("#") && line.contains(PluginConstants.CONTENT_POLICY_PROPERTY)
-                        && line.contains(PluginConstants.IMG_SRC_POLICY)
-                        && line.contains(PluginConstants.SOOS_IMAGES_PRODUCTION_CDN)) {
+                String[] contantsConditions = { PluginConstants.CONTENT_POLICY_PROPERTY, PluginConstants.IMG_SRC_POLICY, PluginConstants.SOOS_IMAGES_PRODUCTION_CDN };
+                if ( !firstChar.equals("#") &&  Arrays.stream(contantsConditions).allMatch(line::contains) ) {
                     reader.close();
                     return;
                 } else if ( !firstChar.equals("#") && line.contains(PluginConstants.CONTENT_POLICY_PROPERTY)
                         && line.contains(PluginConstants.IMG_SRC_POLICY) ) {
                     int index = line.indexOf("blob: ");
-                    line = line.substring(0, index + 6).concat(PluginConstants.SOOS_IMAGES_PRODUCTION_CDN).concat(" ").concat(line.substring(index + 6));
+                    line = line.substring(0, index + 6).concat(PluginConstants.SOOS_IMAGES_PRODUCTION_CDN).concat(PluginConstants.BLANK_SPACE).concat(line.substring(index + 6));
                     lineEdited = true;
                 }
                 stringBuffer.append(line.concat(System.lineSeparator()));
@@ -87,9 +86,8 @@ public class Utils {
         teamcityStartupPropertiesPath.append(pathSeparator);
         teamcityStartupPropertiesPath.append(PluginConstants.TEAMCITY_STARTUP_PROPERTIES_FILE);
         File teamcityStartupPropertiesFile = new File(teamcityStartupPropertiesPath.toString());
-        Scanner reader;
         try {
-            reader = new Scanner(teamcityStartupPropertiesFile);
+            Scanner reader = new Scanner(teamcityStartupPropertiesFile);
             while (reader.hasNextLine()) {
                 String line = reader.nextLine();
                 if ( line.contains(PluginConstants.TEAMCITY_DATA_PATH) ) {
@@ -130,15 +128,22 @@ public class Utils {
         }
     }
 
+
+    /*
+    * this method could be refactored. The only argument that changes if the OS is windows is
+    * PluginConstants.WIN_SCRIPT_EXT or PluginConstants.UNIX_SCRIPT_EXT so we could join the most of the code,
+    *  for example: return File.createTempFile(PluginConstants.CUSTOM_SCRIPT, OS_EXT, teamcityContext.getAgentTempDirectory());
+    *
+    * */
     public static File createScriptFile(TeamcityContext teamcityContext) throws IOException {
 
-        File scriptFile;
+        String os_ext;
         if( OSValidator.isWindows() ) {
-            scriptFile = File.createTempFile(PluginConstants.CUSTOM_SCRIPT, PluginConstants.WIN_SCRIPT_EXT, teamcityContext.getAgentTempDirectory());
-            return scriptFile;
+            os_ext =  PluginConstants.WIN_SCRIPT_EXT;
+        } else {
+            os_ext = PluginConstants.UNIX_SCRIPT_EXT;
         }
-        scriptFile = File.createTempFile(PluginConstants.CUSTOM_SCRIPT, PluginConstants.UNIX_SCRIPT_EXT, teamcityContext.getAgentTempDirectory());
-        return scriptFile;
+        return File.createTempFile(PluginConstants.CUSTOM_SCRIPT, os_ext, teamcityContext.getAgentTempDirectory());
     }
 
     public static StringBuilder createScriptContent(Mode mode, String result, TeamcityContext teamcityContext) {
@@ -177,9 +182,9 @@ public class Utils {
     private static String createReportMsg(String selectedMode, String resultText, String result) {
         StringBuilder msg = new StringBuilder();
         msg.append(PluginConstants.ECHO_COMMAND)
-                .append(" ")
+                .append(PluginConstants.BLANK_SPACE)
                 .append(selectedMode)
-                .append("\n")
+                .append(PluginConstants.LINE_BREAK)
                 .append(PluginConstants.ECHO_COMMAND).append(resultText)
                 .append(result);
         return msg.toString();
