@@ -14,12 +14,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import io.soos.integration.commons.Constants;
 import io.soos.integration.domain.SOOS;
-import io.soos.integration.domain.structure.StructureResponse;
+import io.soos.integration.domain.scan.ScanResponse;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.agent.runner.SimpleProgramCommandLine;
 
+import org.apache.maven.model.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -50,7 +51,7 @@ public class SoosSCAService extends BuildServiceAdapter {
         try {
             SOOS soos = new SOOS();
             soos.getContext().setScriptVersion(getVersionFromProperties());
-            StructureResponse structure;
+            ScanResponse scan;
             AnalysisResultResponse analysisResultResponse;
             mode = soos.getMode();
             LOG.info("--------------------------------------------");
@@ -60,17 +61,17 @@ public class SoosSCAService extends BuildServiceAdapter {
                     LOG.info("Run and Wait Scan");
                     LOG.info("--------------------------------------------");
                     LOG.info("Analysis request is running");
-                    structure = soos.startAnalysis();
-                    analysisResultResponse = soos.getResults(structure.getReportStatusUrl());
-                    result = analysisResultResponse.getReportUrl();
+                    scan = soos.startAnalysis();
+                    analysisResultResponse = soos.getResults(scan.getScanStatusUrl());
+                    result = analysisResultResponse.getScanUrl();
                     LOG.info("Scan analysis finished successfully. To see the results go to: " + result);
                     break;
                 case ASYNC_INIT:
                     LOG.info(PluginConstants.ASYNC_INIT_MODE_SELECTED);
                     LOG.info("Async Init Scan");
                     LOG.info("--------------------------------------------");
-                    structure = soos.startAnalysis();
-                    result = structure.getReportStatusUrl();
+                    scan = soos.startAnalysis();
+                    result = scan.getScanStatusUrl();
                     LOG.info("Analysis request is running, access the report status using this link: " + result);
                     break;
                 case ASYNC_RESULT:
@@ -80,7 +81,7 @@ public class SoosSCAService extends BuildServiceAdapter {
                     LOG.info("--------------------------------------------");
                     LOG.info("Checking Scan Status from: ".concat(reportStatusUrl));
                     analysisResultResponse = soos.getResults(reportStatusUrl);
-                    result = analysisResultResponse.getReportUrl();
+                    result = analysisResultResponse.getScanUrl();
                     LOG.info("Scan analysis finished successfully. To see the results go to: ".concat(result));
                     break;
                 default:
