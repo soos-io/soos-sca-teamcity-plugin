@@ -4,4 +4,5 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd"
        default-autowire="constructor">
        <bean id="soosSCA" class="io.soos.SoosSCA"/>
+       <bean id="soosSCAReport" class="io.soos.web.ResultTab"/>
 </beans>

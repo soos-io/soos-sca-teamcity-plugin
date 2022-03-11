@@ -6,15 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.ObjectUtils;
-
 import io.soos.integration.commons.Constants;
-import jetbrains.buildServer.serverSide.InvalidProperty;
-import jetbrains.buildServer.serverSide.PropertiesProcessor;
-import jetbrains.buildServer.serverSide.RunType;
-import jetbrains.buildServer.serverSide.RunTypeRegistry;
+import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 
 
@@ -46,7 +39,6 @@ public class SoosSCA extends RunType {
     @Override
     public Map<String, String> getDefaultRunnerProperties() {
         Map<String, String> map = new HashMap<>();
-
         map.put(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, String.valueOf(Constants.MIN_RECOMMENDED_ANALYSIS_RESULT_MAX_WAIT));
         map.put(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, String.valueOf(Constants.MIN_ANALYSIS_RESULT_POLLING_INTERVAL));
         map.put(Constants.MAP_PARAM_API_BASE_URI_KEY, Constants.SOOS_DEFAULT_API_URL);
@@ -75,15 +67,17 @@ public class SoosSCA extends RunType {
 
     @Override
     public String describeParameters(Map<String, String> parameters) {
-
-        List<String> listParams = new ArrayList<>();
-        
+        List<String> list = new ArrayList<>();
         parameters.forEach((key, param) -> {
-            listParams.add(param);
+            list.add(param);
         });
-
-        String stringParams = String.join(" - ", listParams.stream().filter(param -> !param.equals("default")).collect(Collectors.toList()));
-        StringBuilder parametersSB = new StringBuilder("Parameters: ").append(stringParams);
+        List<String> listParams = filterListParams(list);
+        String stringParams = String.join(PluginConstants.DELIMITER_HYPHEN, listParams);
+        StringBuilder parametersSB = new StringBuilder(PluginConstants.PARAMETERS).append(stringParams);
         return parametersSB.toString();
+    }
+
+    private List<String> filterListParams(List<String> list) {
+        return list.stream().filter(param -> !param.contains(PluginConstants.DEFAULT)).collect(Collectors.toList());
     }
 }

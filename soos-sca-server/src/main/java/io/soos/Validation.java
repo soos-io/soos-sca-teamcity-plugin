@@ -31,7 +31,6 @@ public class Validation {
             list.add(new InvalidProperty(Constants.MAP_PARAM_PROJECT_NAME_KEY, ErrorMessage.shouldBeMoreThanXCharacters(PluginConstants.MIN_NUMBER_OF_CHARACTERS)));
         }
 
-
         if( !validateIsNumeric(analysisResultMaxWait) ){
             list.add(new InvalidProperty(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, ErrorMessage.SHOULD_BE_A_NUMBER));
         }
