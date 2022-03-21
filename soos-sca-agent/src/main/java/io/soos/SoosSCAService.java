@@ -1,118 +1,130 @@
 package io.soos;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 
+import io.soos.domain.TeamcityContext;
 import io.soos.integration.domain.Mode;
+import io.soos.integration.domain.analysis.AnalysisResultResponse;
+import io.soos.utils.Utils;
+import jetbrains.buildServer.vcs.VcsRootEntry;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import io.soos.integration.commons.Constants;
 import io.soos.integration.domain.SOOS;
-import io.soos.integration.domain.analysis.AnalysisResultResponse;
-import io.soos.integration.domain.structure.StructureResponse;
+import io.soos.integration.domain.scan.ScanResponse;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.runner.BuildServiceAdapter;
 import jetbrains.buildServer.agent.runner.ProgramCommandLine;
 import jetbrains.buildServer.agent.runner.SimpleProgramCommandLine;
-import jetbrains.buildServer.util.FileUtil;
-import jetbrains.buildServer.util.TCStreamUtil;
+
+import org.apache.maven.model.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 
 public class SoosSCAService extends BuildServiceAdapter {
-    
-    private final Set<File> myFilesToDelete = new HashSet<File>();
-    private static Logger LOG = Logger.getLogger(SoosSCAService.class.getName());
-    
+
+    private static final Logger LOG = Logger.getLogger(SoosSCAService.class.getName());
+
+    @NotNull
     @Override
     public ProgramCommandLine makeProgramCommandLine() throws RunBuildException {
-
+        TeamcityContext teamcityContext = new TeamcityContext();
+        teamcityContext.setDataPath(this.getEnvironmentVariables().get(PluginConstants.TEAMCITY_DATA_PATH_ENV));
+        teamcityContext.setBuildTypeId(this.getSystemProperties().get(PluginConstants.TEAMCITY_BUILD_TYPE_ID));
+        teamcityContext.setBuildConfName(this.getSystemProperties().get(PluginConstants.TEAMCITY_BUILD_CONF_NAME));
+        teamcityContext.setBuildId(this.getSystemProperties().get(PluginConstants.TEAMCITY_BUILD_ID));
+        teamcityContext.setAgentTempDirectory(getAgentTempDirectory());
+        if ( ObjectUtils.isEmpty(teamcityContext.getDataPath()) ) {
+            String teamcitySeverPath = new File(this.getSystemProperties().get(PluginConstants.AGENT_HOME_DIR)).getParent();
+            teamcityContext.setDataPath(Utils.getTeamcityDataPath(teamcitySeverPath));
+        }
+        Utils.addContentPolicyToShowSoosImgs(teamcityContext);
         Map<String, String> runnerParameters = getRunnerParameters();
-
-        Map<String, String> map = new HashMap<String, String>(populateContext(runnerParameters));
+        Map<String, String> map = new HashMap<>(populateContext(runnerParameters));
         setEnvProperties(map);
-
         String onFailure = getRunnerParameters().get(Constants.MAP_PARAM_ON_FAILURE_KEY);
-
-        String reportUrl = "";
+        String result;
         Mode mode;
         try {
-
             SOOS soos = new SOOS();
             soos.getContext().setScriptVersion(getVersionFromProperties());
-            StructureResponse structure = soos.getStructure();
-
-            long filesProcessed = soos.sendManifestFiles(structure.getProjectId(), structure.getAnalysisId());
-            StringBuilder fileProcessed = new StringBuilder("File processed: ").append(String.valueOf(filesProcessed));
-            LOG.info(fileProcessed.toString());
-
+            ScanResponse scan;
+            AnalysisResultResponse analysisResultResponse;
             mode = soos.getMode();
-            if(filesProcessed > 0) {
-                reportUrl = structure.getReportURL();
-                switch ( mode ) {
-                    case RUN_AND_WAIT:
-                        LOG.info(PluginConstants.RUN_AND_WAIT_MODE_SELECTED);
-                        startAnalysis(soos, structure);
-                        processResult(soos, structure);
-                        break;
-                    case ASYNC_INIT:
-                        LOG.info(PluginConstants.ASYNC_INIT_MODE_SELECTED);
-                        startAnalysis(soos, structure);
-                        break;
-                    case ASYNC_RESULT:
-                        LOG.info(PluginConstants.ASYNC_RESULT_MODE_SELECTED);
-                        processResult(soos, structure);
-                        break;
-                }
-
+            LOG.info("--------------------------------------------");
+            switch ( mode ) {
+                case RUN_AND_WAIT:
+                    LOG.info(PluginConstants.RUN_AND_WAIT_MODE_SELECTED);
+                    LOG.info("Run and Wait Scan");
+                    LOG.info("--------------------------------------------");
+                    LOG.info("Analysis request is running");
+                    scan = soos.startAnalysis();
+                    analysisResultResponse = soos.getResults(scan.getScanStatusUrl());
+                    result = analysisResultResponse.getScanUrl();
+                    LOG.info("Scan analysis finished successfully. To see the results go to: " + result);
+                    break;
+                case ASYNC_INIT:
+                    LOG.info(PluginConstants.ASYNC_INIT_MODE_SELECTED);
+                    LOG.info("Async Init Scan");
+                    LOG.info("--------------------------------------------");
+                    scan = soos.startAnalysis();
+                    result = scan.getScanStatusUrl();
+                    LOG.info("Analysis request is running, access the report status using this link: " + result);
+                    break;
+                case ASYNC_RESULT:
+                    String reportStatusUrl = Utils.getReportStatusUrl(teamcityContext);
+                    LOG.info(PluginConstants.ASYNC_RESULT_MODE_SELECTED);
+                    LOG.info("Async Result Scan");
+                    LOG.info("--------------------------------------------");
+                    LOG.info("Checking Scan Status from: ".concat(reportStatusUrl));
+                    analysisResultResponse = soos.getResults(reportStatusUrl);
+                    result = analysisResultResponse.getScanUrl();
+                    LOG.info("Scan analysis finished successfully. To see the results go to: ".concat(result));
+                    break;
+                default:
+                    throw new Exception("Invalid SCA Mode");
             }
-
         } catch (Exception e) {
             LOG.severe(e.toString());
-            StringBuilder errorMsg = new StringBuilder("SOOS SCA cannot be done, error: ").append(e.toString());
-
-            RunBuildException exception = new RunBuildException(errorMsg.toString());
-            exception.setLogStacktrace(false);
+            StringBuilder errorMsg = new StringBuilder("SOOS SCA cannot be done, error: ").append(e);
             if(onFailure.equals(PluginConstants.FAIL_THE_BUILD)){
+                RunBuildException exception = new RunBuildException(errorMsg.toString());
+                exception.setLogStacktrace(false);
                 throw exception;
             } else {
-                return new SimpleProgramCommandLine(getRunnerContext(), "/bin/echo", Arrays.asList(new String[]{exception.toString()}));
+                errorMsg = new StringBuilder(PluginConstants.ECHO_COMMAND).append(" '").append(errorMsg).append("'");
+                return getSimpleCommandLine(errorMsg, teamcityContext);
             }
         }
+        StringBuilder scriptContent = Utils.createScriptContent(mode, result, teamcityContext);
+        return getSimpleCommandLine(scriptContent, teamcityContext);
+    }
 
-        StringBuilder scriptContent = new StringBuilder();
-        if( !mode.equals(Mode.ASYNC_INIT)){
-            if( mode.equals(Mode.RUN_AND_WAIT) ){
-                scriptContent.append("/bin/echo '").append(PluginConstants.RUN_AND_WAIT_MODE_SELECTED).append("'\n");
-            } else {
-                scriptContent.append("/bin/echo '").append(PluginConstants.ASYNC_RESULT_MODE_SELECTED).append("'\n");
-            }
-            scriptContent.append("/bin/echo 'Open the following url to see the report: ").append(reportUrl).append("'");
-        } else {
-            scriptContent.append("/bin/echo '").append(PluginConstants.ASYNC_INIT_MODE_SELECTED).append("'");
-        }
-
-        final String script = getCustomScript(scriptContent.toString());
-
-        setExecutableAttribute(script);
-
+    private SimpleProgramCommandLine getSimpleCommandLine(StringBuilder scriptContent, TeamcityContext teamcityContext) throws RunBuildException {
+        final String script = Utils.getCustomScript(scriptContent.toString(), teamcityContext);
+        Utils.setExecutableAttribute(script);
         return new SimpleProgramCommandLine(getRunnerContext(), script, Collections.emptyList());
     }
 
-    private void startAnalysis(SOOS soos, StructureResponse structure) throws Exception {
-        soos.startAnalysis(structure.getProjectId(), structure.getAnalysisId());
-    }
-
-    private void processResult(SOOS soos, StructureResponse structure) throws Exception {
-        soos.getResults(structure.getReportStatusUrl());
-    }
-
     private Map<String, String> populateContext(Map<String, String> runnerParameters) {
-        Map<String, String> map = new HashMap<String,String>();
+        String branchUri = "";
+        String branchName = "";
+        String commitHash = getBuildParameters().getSystemProperties().get(PluginConstants.SYSTEM_BUILD_VCS_NUMBER);
+        String buildId = getBuildParameters().getSystemProperties().get(PluginConstants.SYSTEM_BUILD_NUMBER);
 
+        for (VcsRootEntry entry: getBuild().getVcsRootEntries()) {
+            branchUri = entry.getVcsRoot().getProperty(PluginConstants.URL);
+            branchName = entry.getVcsRoot().getProperty(PluginConstants.BRANCH);
+        }
+
+        String[] arr = branchName.split(PluginConstants.SLASH);
+        branchName = arr[arr.length - 1];
+
+        Map<String, String> map = new HashMap<>();
         String dirsToExclude = addSoosDirToExclusion(runnerParameters.get(Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY));
-
         map.put(Constants.PARAM_PROJECT_NAME_KEY, runnerParameters.get(Constants.MAP_PARAM_PROJECT_NAME_KEY));
         map.put(Constants.PARAM_MODE_KEY, runnerParameters.get(Constants.MAP_PARAM_MODE_KEY));
         map.put(Constants.PARAM_ON_FAILURE_KEY, runnerParameters.get(Constants.MAP_PARAM_ON_FAILURE_KEY));
@@ -123,11 +135,11 @@ public class SoosSCAService extends BuildServiceAdapter {
         map.put(Constants.PARAM_API_BASE_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_API_BASE_URI_KEY));
         map.put(Constants.PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, runnerParameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY));
         map.put(Constants.PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, runnerParameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY));
-        map.put(Constants.PARAM_OPERATING_ENVIRONMENT_KEY, runnerParameters.get(Constants.MAP_PARAM_OPERATING_ENVIRONMENT_KEY));
-        map.put(Constants.PARAM_BRANCH_NAME_KEY, runnerParameters.get(Constants.MAP_PARAM_BRANCH_NAME_KEY));
-        map.put(Constants.PARAM_BRANCH_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_BRANCH_URI_KEY));
-        map.put(Constants.PARAM_COMMIT_HASH_KEY, runnerParameters.get(Constants.MAP_PARAM_COMMIT_HASH_KEY));
-        map.put(Constants.PARAM_BUILD_VERSION_KEY, runnerParameters.get(Constants.MAP_PARAM_BUILD_VERSION_KEY));
+        map.put(Constants.PARAM_OPERATING_ENVIRONMENT_KEY, Utils.getOperatingSystem());
+        map.put(Constants.PARAM_BRANCH_NAME_KEY, branchName);
+        map.put(Constants.PARAM_BRANCH_URI_KEY, branchUri);
+        map.put(Constants.PARAM_COMMIT_HASH_KEY, commitHash);
+        map.put(Constants.PARAM_BUILD_VERSION_KEY, buildId);
         map.put(Constants.PARAM_BUILD_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_BUILD_URI_KEY));
         map.put(Constants.PARAM_INTEGRATION_NAME_KEY, PluginConstants.INTEGRATION_NAME);
         map.put(Constants.SOOS_CLIENT_ID, getSystemProperties().get(Constants.SOOS_CLIENT_ID));
@@ -139,59 +151,27 @@ public class SoosSCAService extends BuildServiceAdapter {
         if(StringUtils.isBlank(getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY))) {
             map.put(Constants.PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, String.valueOf(Constants.MIN_ANALYSIS_RESULT_POLLING_INTERVAL));
         }
-
         return map;
     }
 
     private void setEnvProperties(Map<String, String> map){
-
         map.forEach((key, value) -> {
             if(StringUtils.isNotBlank(value)) {
                 System.setProperty(key, value);
             }
         });
-
-    }
-
-    private void setExecutableAttribute(String script) throws RunBuildException {
-        try {
-            TCStreamUtil.setFileMode(new File(script), PluginConstants.FILE_MODE);
-        } catch ( Throwable t ){
-            StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("Failed to set executable attribute for custom script '").append(script).append("'");
-            throw new RunBuildException(errorMsg.toString(), t);
-        }
-    }
-
-    private String getCustomScript(String scriptContent) throws RunBuildException {
-        try {
-            final File scriptFile = File.createTempFile("custom_script", ".sh", getAgentTempDirectory());
-            FileUtil.writeFileAndReportErrors(scriptFile, scriptContent);
-            myFilesToDelete.add(scriptFile);
-            return scriptFile.getAbsolutePath();
-        } catch ( IOException e ) {
-            StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("Failed to create temporary custom script in directory: ").append(getAgentTempDirectory());
-            RunBuildException exception = new RunBuildException(errorMsg.toString(), e);
-            exception.setLogStacktrace(false);
-            throw exception;
-        }
     }
 
     @Override
     public void afterProcessFinished() throws RunBuildException {
         super.afterProcessFinished();
-        for( File file : myFilesToDelete ){
-            FileUtil.delete(file);
-        }
-        myFilesToDelete.clear();
+        Utils.removeTempScripts();
     }
 
     private String addSoosDirToExclusion(String dirs){
         if(StringUtils.isNotBlank(dirs)){
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(dirs).append(",").append(PluginConstants.SOOS_DIR_NAME);
-             
             return stringBuilder.toString();
         } 
         
@@ -209,5 +189,4 @@ public class SoosSCAService extends BuildServiceAdapter {
         }
         return null;
     }
-
 }
