@@ -9,8 +9,8 @@
   <artifactId>soos-sca-server</artifactId>
   <packaging>jar</packaging>
   <properties>
-    <soos-sca.version>1.0.6</soos-sca.version>
-    <sca.version>${parent.version}</sca.version>
+    <soos-sca.version>1.0.7</soos-sca.version>
+    <sca.version>${project.parent.version}</sca.version>
   </properties>
 
   <dependencies>
