@@ -88,8 +88,8 @@
         <td>
             <div class="posRel">
                 <props:selectProperty name="${onFailure}">
-                    <props:option value="fail_the_build">Fail the build</props:option>
                     <props:option value="continue_on_failure">Continue on failure</props:option>
+                    <props:option value="fail_the_build">Fail the build</props:option>
                 </props:selectProperty>
             </div>
         </td>
