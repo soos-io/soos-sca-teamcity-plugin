@@ -15,5 +15,5 @@ jobs:
       uses: soos-io/soos-sca-github-action@v1.1.0
       with:
         project_name: "soos-sca-teamcity-plugin"
-        SOOS_CLIENT_ID: ${{ secrets.SOOS_CLIENT_ID }}
-        SOOS_API_KEY: ${{ secrets.SOOS_API_KEY }}
+        client_id: ${{ secrets.SOOS_CLIENT_ID }}
+        api_key: ${{ secrets.SOOS_API_KEY }}
