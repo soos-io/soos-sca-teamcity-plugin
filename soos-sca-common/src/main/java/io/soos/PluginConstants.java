@@ -8,6 +8,7 @@ public final class PluginConstants {
     public static final String DESCRIPTION = "Scan your open source software for vulnerabilities and control the introduction of new dependencies";
     public static final String TYPE = "SOOS-SCA";
     public static final String FAIL_THE_BUILD = "fail_the_build";
+    public static final String FAILED_WITH_ISSUES = "FailedWithIssues";
     public static final String INTEGRATION_NAME = "TeamCity";
     public static final String SOOS_DIR_NAME = "soos";
     public static final String EDIT_PARAMETERS_FILE_NAME = "editParameters.jsp";

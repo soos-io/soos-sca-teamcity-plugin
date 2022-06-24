@@ -6,15 +6,9 @@ import java.util.logging.Logger;
 
 import io.soos.PluginConstants;
 import io.soos.domain.TeamcityContext;
-import io.soos.integration.domain.Mode;
 import io.soos.integration.validators.OSValidator;
-import jetbrains.buildServer.RunBuildException;
-import jetbrains.buildServer.util.FileUtil;
-import jetbrains.buildServer.util.TCStreamUtil;
 
 public class Utils {
-
-    private static final Set<File> myFilesToDelete = new HashSet<>();
 
     private static final Logger LOG = Logger.getLogger(Utils.class.getName());
 
@@ -103,98 +97,10 @@ public class Utils {
         return null;
     }
 
-    public static void setExecutableAttribute(String script) throws RunBuildException {
-        try {
-            TCStreamUtil.setFileMode(new File(script), PluginConstants.FILE_MODE);
-        } catch ( Throwable t ){
-            StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("Failed to set executable attribute for custom script '").append(script).append("'");
-            throw new RunBuildException(errorMsg.toString(), t);
-        }
-    }
-
-    public static String getCustomScript(String scriptContent, TeamcityContext teamcityContext) throws RunBuildException {
-        try {
-            final File scriptFile = createScriptFile(teamcityContext);
-            FileUtil.writeFileAndReportErrors(scriptFile, scriptContent);
-            myFilesToDelete.add(scriptFile);
-            return scriptFile.getAbsolutePath();
-        } catch ( IOException e ) {
-            StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("Failed to create temporary custom script in directory: ").append(teamcityContext.getAgentTempDirectory());
-            RunBuildException exception = new RunBuildException(errorMsg.toString(), e);
-            exception.setLogStacktrace(false);
-            throw exception;
-        }
-    }
-
-
-    /*
-    * this method could be refactored. The only argument that changes if the OS is windows is
-    * PluginConstants.WIN_SCRIPT_EXT or PluginConstants.UNIX_SCRIPT_EXT so we could join the most of the code,
-    *  for example: return File.createTempFile(PluginConstants.CUSTOM_SCRIPT, OS_EXT, teamcityContext.getAgentTempDirectory());
-    *
-    * */
-    public static File createScriptFile(TeamcityContext teamcityContext) throws IOException {
-
-        String os_ext;
-        if( OSValidator.isWindows() ) {
-            os_ext =  PluginConstants.WIN_SCRIPT_EXT;
-        } else {
-            os_ext = PluginConstants.UNIX_SCRIPT_EXT;
-        }
-        return File.createTempFile(PluginConstants.CUSTOM_SCRIPT, os_ext, teamcityContext.getAgentTempDirectory());
-    }
-
-    public static StringBuilder createScriptContent(Mode mode, String result, TeamcityContext teamcityContext) {
-        StringBuilder scriptContent = new StringBuilder();
-        String resultText = " Click to see report: ";
-        switch ( mode ){
-            case RUN_AND_WAIT:
-                scriptContent.append(createReportMsg(PluginConstants.RUN_AND_WAIT_MODE_SELECTED, resultText, result));
-                break;
-            case ASYNC_RESULT:
-                scriptContent.append(createReportMsg(PluginConstants.ASYNC_RESULT_MODE_SELECTED, resultText, result));
-                break;
-            default:
-                resultText = " Report status URL: ";
-                scriptContent.append(createReportMsg(PluginConstants.ASYNC_INIT_MODE_SELECTED, resultText, result));
-        }
-
-        String artifact_path = getBuildArtifactsDirectory(teamcityContext);
-        if ( !OSValidator.isWindows() ) {
-            scriptContent.append(PluginConstants.PIPE);
-            scriptContent.append(PluginConstants.TEE_COMMAND);
-        } else {
-            scriptContent.append(PluginConstants.GREATER_THAN);
-        }
-        scriptContent.append(artifact_path);
-        scriptContent.append(PluginConstants.RESULT_FILE);
-        return scriptContent;
-    }
-
     public static String getBuildArtifactsDirectory(TeamcityContext teamcityContext){
         ResultFilePathBuilder resultFilePathBuilder = new ResultFilePathBuilder(teamcityContext.getDataPath(), PluginConstants.SYSTEM,
                 PluginConstants.ARTIFACTS, teamcityContext.getBuildTypeId(), teamcityContext.getBuildConfName(), teamcityContext.getBuildId());
         return resultFilePathBuilder.createPath();
-    }
-
-    private static String createReportMsg(String selectedMode, String resultText, String result) {
-        StringBuilder msg = new StringBuilder();
-        msg.append(PluginConstants.ECHO_COMMAND)
-                .append(PluginConstants.BLANK_SPACE)
-                .append(selectedMode)
-                .append(PluginConstants.LINE_BREAK)
-                .append(PluginConstants.ECHO_COMMAND).append(resultText)
-                .append(result);
-        return msg.toString();
-    }
-
-    public static void removeTempScripts() {
-        for( File file : myFilesToDelete ){
-            FileUtil.delete(file);
-        }
-        myFilesToDelete.clear();
     }
 
     public static String getOperatingSystem() {
