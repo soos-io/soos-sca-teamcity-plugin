@@ -47,7 +47,6 @@ public class SoosSCABuildProcess implements BuildProcess {
             String teamcitySeverPath = new File(myContext.getBuildParameters().getSystemProperties().get(PluginConstants.AGENT_HOME_DIR)).getParent();
             teamcityContext.setDataPath(Utils.getTeamcityDataPath(teamcitySeverPath));
         }
-        Utils.addContentPolicyToShowSoosImgs(teamcityContext);
         Map<String, String> runnerParameters = myContext.getRunnerParameters();
         Map<String, String> map = new HashMap<>(populateContext(runnerParameters));
         setEnvProperties(map);
