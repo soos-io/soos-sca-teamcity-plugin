@@ -14,6 +14,7 @@
 <c:set var="mode" value="<%=Constants.MAP_PARAM_MODE_KEY%>"/>
 <c:set var="dirsToExclude" value="<%=Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY%>"/>
 <c:set var="filesToExclude" value="<%=Constants.MAP_PARAM_FILES_TO_EXCLUDE_KEY%>"/>
+<c:set var="packageManagers" value="<%=Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY%>"/>
 
 <c:set var="onFailure" value="<%=Constants.MAP_PARAM_ON_FAILURE_KEY%>"/>
 <c:set var="analysisResultMaxWait" value="<%=Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY%>"/>
@@ -95,6 +96,18 @@
         </td>
     </tr>
     <tr>
+        <th><label for="${packageManagers}">Package Managers to look for: </label></th>
+        <td>
+            <div class="posRel">
+                <props:textProperty name="${packageManagers}" size="36" />
+                <span class="error" id="error_${packageManagers}"></span>
+            </div>
+            <div>
+                <label>Separate Package Manager names with a comma</label>
+            </div>
+        </td>
+    </tr>
+    <tr>
         <th><label for="${analysisResultMaxWait}">Analysis Res. Max Wait: </label></th>
         <td>
             <div class="posRel">
@@ -121,4 +134,5 @@
             </div>
         </td>
     </tr>
+
 </l:settingsGroup>
