@@ -140,6 +140,7 @@ public class SoosSCABuildProcess implements BuildProcess {
         map.put(Constants.PARAM_MODE_KEY, runnerParameters.get(Constants.MAP_PARAM_MODE_KEY));
         map.put(Constants.PARAM_ON_FAILURE_KEY, runnerParameters.get(Constants.MAP_PARAM_ON_FAILURE_KEY));
         map.put(Constants.PARAM_DIRS_TO_EXCLUDE_KEY, dirsToExclude);
+        map.put(Constants.PARAM_PACKAGE_MANAGERS_KEY, runnerParameters.get(Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY));
         map.put(Constants.PARAM_FILES_TO_EXCLUDE_KEY, runnerParameters.get(Constants.MAP_PARAM_FILES_TO_EXCLUDE_KEY));
         map.put(Constants.PARAM_WORKSPACE_DIR_KEY, runnerParameters.get(PluginConstants.WORKING_DIR));
         map.put(Constants.PARAM_CHECKOUT_DIR_KEY, runnerParameters.get(PluginConstants.CHECKOUT_DIR));
@@ -155,7 +156,6 @@ public class SoosSCABuildProcess implements BuildProcess {
         map.put(Constants.PARAM_INTEGRATION_NAME_KEY, PluginConstants.INTEGRATION_NAME);
         map.put(Constants.SOOS_CLIENT_ID, myContext.getBuildParameters().getSystemProperties().get(Constants.SOOS_CLIENT_ID));
         map.put(Constants.SOOS_API_KEY, myContext.getBuildParameters().getSystemProperties().get(Constants.SOOS_API_KEY));
-
         if(StringUtils.isBlank(myContext.getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY))) {
             map.put(Constants.PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, String.valueOf(Constants.MIN_RECOMMENDED_ANALYSIS_RESULT_MAX_WAIT));
         }
