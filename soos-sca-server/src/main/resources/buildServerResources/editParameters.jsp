@@ -103,7 +103,7 @@
                 <span class="error" id="error_${packageManagers}"></span>
             </div>
             <div>
-                <label>Separate Package Managers names with a comma</label>
+                <label>Separate Package Manager names with a comma</label>
             </div>
         </td>
     </tr>
