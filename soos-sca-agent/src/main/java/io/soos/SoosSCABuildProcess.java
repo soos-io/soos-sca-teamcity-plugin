@@ -114,9 +114,7 @@ public class SoosSCABuildProcess implements BuildProcess {
 
     private void setEnvProperties(Map<String, String> map){
         map.forEach((key, value) -> {
-            if(StringUtils.isNotBlank(value)) {
                 System.setProperty(key, value);
-            }
         });
     }
 
