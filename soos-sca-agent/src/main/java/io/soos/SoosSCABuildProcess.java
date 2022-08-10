@@ -114,7 +114,7 @@ public class SoosSCABuildProcess implements BuildProcess {
 
     private void setEnvProperties(Map<String, String> map){
         map.forEach((key, value) -> {
-            if(StringUtils.isNotBlank(value)) {
+            if(StringUtils.isNotBlank(value) || key.equals(Constants.PARAM_PACKAGE_MANAGERS_KEY)) {
                 System.setProperty(key, value);
             }
         });
@@ -140,7 +140,7 @@ public class SoosSCABuildProcess implements BuildProcess {
         map.put(Constants.PARAM_MODE_KEY, runnerParameters.get(Constants.MAP_PARAM_MODE_KEY));
         map.put(Constants.PARAM_ON_FAILURE_KEY, runnerParameters.get(Constants.MAP_PARAM_ON_FAILURE_KEY));
         map.put(Constants.PARAM_DIRS_TO_EXCLUDE_KEY, dirsToExclude);
-        map.put(Constants.PARAM_PACKAGE_MANAGERS_KEY, runnerParameters.get(Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY));
+        map.put(Constants.PARAM_PACKAGE_MANAGERS_KEY, runnerParameters.get(Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY) != null ? runnerParameters.get(Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY) : "");
         map.put(Constants.PARAM_FILES_TO_EXCLUDE_KEY, runnerParameters.get(Constants.MAP_PARAM_FILES_TO_EXCLUDE_KEY));
         map.put(Constants.PARAM_WORKSPACE_DIR_KEY, runnerParameters.get(PluginConstants.WORKING_DIR));
         map.put(Constants.PARAM_CHECKOUT_DIR_KEY, runnerParameters.get(PluginConstants.CHECKOUT_DIR));
