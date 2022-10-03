@@ -4,7 +4,7 @@
   <info>
     <name>SOOS SCA</name>
     <display-name>SOOS SCA</display-name>
-    <version>1.3.10</version>
+    <version>1.3.11</version>
     <description>Scan your open source software for vulnerabilities and control the introduction of new dependencies</description>
     <download-url>https://github.com/soos-io/soos-sca-teamcity</download-url>
     <email>support@soos.io</email>
