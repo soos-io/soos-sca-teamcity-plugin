@@ -11,7 +11,6 @@
 <c:set var="branchName" value="<%=Constants.MAP_PARAM_BRANCH_NAME_KEY%>"/>
 <c:set var="buildVersion" value="<%=Constants.MAP_PARAM_BUILD_VERSION_KEY%>"/>
 <c:set var="buildURI" value="<%=Constants.MAP_PARAM_BUILD_URI_KEY%>"/>
-<c:set var="mode" value="<%=Constants.MAP_PARAM_MODE_KEY%>"/>
 <c:set var="dirsToExclude" value="<%=Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY%>"/>
 <c:set var="filesToExclude" value="<%=Constants.MAP_PARAM_FILES_TO_EXCLUDE_KEY%>"/>
 <c:set var="packageManagers" value="<%=Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY%>"/>
@@ -21,13 +20,6 @@
 <c:set var="resultPollingInterval" value="<%=Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY%>"/>
 <c:set var="apiBaseURI" value="<%=Constants.MAP_PARAM_API_BASE_URI_KEY%>"/>
 
-<script type="text/javascript">
-    function sendModeAndCleanField(mode) {
-        if ( mode !== 'async_result') {
-            document.getElementById("reportStatusURL").value = '';
-        }
-    }
-</script>
 
 <l:settingsGroup title="SOOS SCA settings">
     <tr>
@@ -45,18 +37,6 @@
             <div class="posRel">
                 <props:textProperty name="${buildURI}" size="36" />
                 <span class="error" id="error_${buildURI}"></span>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <th><label for="${mode}">Mode: </label></th>
-        <td>
-            <div class="posRel">
-                <props:selectProperty name="${mode}" onchange="sendModeAndCleanField(this.value)">
-                    <props:option value="run_and_wait">Run and wait</props:option>
-                    <props:option value="async_init">Async init</props:option>
-                    <props:option value="async_result">Async result</props:option>
-                </props:selectProperty>
             </div>
         </td>
     </tr>
