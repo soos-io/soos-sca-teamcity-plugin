@@ -2,7 +2,6 @@ package io.soos;
 
 import io.soos.domain.TeamcityContext;
 import io.soos.integration.commons.Constants;
-import io.soos.integration.domain.Mode;
 import io.soos.integration.domain.SOOS;
 import io.soos.integration.domain.analysis.AnalysisResultResponse;
 import io.soos.integration.domain.scan.ScanResponse;
@@ -53,50 +52,21 @@ public class SoosSCABuildProcess implements BuildProcess {
         String onFailure = myContext.getRunnerParameters().get(Constants.MAP_PARAM_ON_FAILURE_KEY);
         String result;
         String scanStatus = "";
-        Mode mode;
         try {
             SOOS soos = new SOOS();
             soos.getContext().setScriptVersion(getVersionFromProperties());
             ScanResponse scan;
             AnalysisResultResponse analysisResultResponse;
-            mode = soos.getMode();
             myBuildLogger.message("--------------------------------------------");
-            switch ( mode ) {
-                case RUN_AND_WAIT:
-                    myBuildLogger.message(PluginConstants.RUN_AND_WAIT_MODE_SELECTED);
-                    myBuildLogger.message("Run and Wait Scan");
-                    myBuildLogger.message("--------------------------------------------");
-                    myBuildLogger.message("Analysis request is running");
-                    scan = soos.startAnalysis();
-                    analysisResultResponse = soos.getResults(scan.getScanStatusUrl());
-                    result = analysisResultResponse.getScanUrl();
-                    scanStatus = analysisResultResponse.getStatus();
-                    myBuildLogger.message("Scan analysis finished successfully. To see the full report go to: " + result);
-                    myBuildLogger.message("Violations found: " + analysisResultResponse.getViolations() + " | Vulnerabilities found: " + analysisResultResponse.getVulnerabilities() );
-                    break;
-                case ASYNC_INIT:
-                    myBuildLogger.message(PluginConstants.ASYNC_INIT_MODE_SELECTED);
-                    myBuildLogger.message("Async Init Scan");
-                    myBuildLogger.message("--------------------------------------------");
-                    scan = soos.startAnalysis();
-                    result = scan.getScanStatusUrl();
-                    myBuildLogger.message("Analysis request is running, access the report status using this link: " + result);
-                    break;
-                case ASYNC_RESULT:
-                    String reportStatusUrl = Utils.getReportStatusUrl(teamcityContext);
-                    myBuildLogger.message(PluginConstants.ASYNC_RESULT_MODE_SELECTED);
-                    myBuildLogger.message("Async Result Scan");
-                    myBuildLogger.message("--------------------------------------------");
-                    myBuildLogger.message("Checking Scan Status from: ".concat(reportStatusUrl));
-                    analysisResultResponse = soos.getResults(reportStatusUrl);
-                    result = analysisResultResponse.getScanUrl();
-                    scanStatus = analysisResultResponse.getStatus();
-                    myBuildLogger.message("Scan analysis finished successfully. To see the full report go to: ".concat(result));
-                    myBuildLogger.message("Violations found: " + analysisResultResponse.getViolations() + " | Vulnerabilities found: " + analysisResultResponse.getVulnerabilities() );
-                    break;
-                default:
-                    throw new Exception("Invalid SCA Mode");
-            }
+            myBuildLogger.message("SOOS SCA Scan");
+            myBuildLogger.message("--------------------------------------------");
+            myBuildLogger.message("Analysis request is running");
+            scan = soos.startAnalysis();
+            analysisResultResponse = soos.getResults(scan.getScanStatusUrl());
+            result = analysisResultResponse.getScanUrl();
+            scanStatus = analysisResultResponse.getStatus();
+            myBuildLogger.message("Scan analysis finished successfully. To see the full report go to: " + result);
+            myBuildLogger.message("Violations found: " + analysisResultResponse.getViolations() + " | Vulnerabilities found: " + analysisResultResponse.getVulnerabilities() );
         } catch (Exception e) {
             StringBuilder errorMsg = new StringBuilder("SOOS SCA cannot be done, error: ").append(e);
             RunBuildException exception = new RunBuildException(errorMsg.toString());
@@ -137,7 +107,6 @@ public class SoosSCABuildProcess implements BuildProcess {
         Map<String, String> map = new HashMap<>();
         String dirsToExclude = addSoosDirToExclusion(runnerParameters.get(Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY));
         map.put(Constants.PARAM_PROJECT_NAME_KEY, runnerParameters.get(Constants.MAP_PARAM_PROJECT_NAME_KEY));
-        map.put(Constants.PARAM_MODE_KEY, runnerParameters.get(Constants.MAP_PARAM_MODE_KEY));
         map.put(Constants.PARAM_ON_FAILURE_KEY, runnerParameters.get(Constants.MAP_PARAM_ON_FAILURE_KEY));
         map.put(Constants.PARAM_DIRS_TO_EXCLUDE_KEY, dirsToExclude);
         map.put(Constants.PARAM_PACKAGE_MANAGERS_KEY, runnerParameters.get(Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY) != null ? runnerParameters.get(Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY) : "");

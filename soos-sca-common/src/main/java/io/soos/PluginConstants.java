@@ -15,9 +15,6 @@ public final class PluginConstants {
     public static final String WORKING_DIR = "teamcity.build.workingDir";
     public static final String CHECKOUT_DIR = "teamcity.build.checkoutDir";
     public static final String FILE_MODE = "a+x";
-    public static final String RUN_AND_WAIT_MODE_SELECTED = "run_and_wait mode selected, starting synchronous analysis...";
-    public static final String ASYNC_INIT_MODE_SELECTED = "async_init mode selected, starting asynchronous analysis...";
-    public static final String ASYNC_RESULT_MODE_SELECTED = "async_result mode selected, getting result from previous analysis...";
     public static final Integer MIN_NUMBER_OF_CHARACTERS = 5;
     public static final String PROPERTIES_FILE = "/teamcity.properties";
     public static final String VERSION = "version";
