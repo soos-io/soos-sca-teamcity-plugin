@@ -4,7 +4,7 @@
   <parent>
     <artifactId>soos-sca</artifactId>
     <groupId>io.soos</groupId>
-    <version>1.4.1</version>
+    <version>1.4.2</version>
   </parent>
   <artifactId>soos-sca-server</artifactId>
   <packaging>jar</packaging>
