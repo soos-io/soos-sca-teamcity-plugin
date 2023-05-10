@@ -95,14 +95,17 @@ public class SoosSCABuildProcess implements BuildProcess {
         String branchName = "";
         String commitHash = myContext.getBuildParameters().getSystemProperties().get(PluginConstants.SYSTEM_BUILD_VCS_NUMBER);
         String buildId = myContext.getBuildParameters().getSystemProperties().get(PluginConstants.SYSTEM_BUILD_NUMBER);
+        for (VcsRootEntry entry : myContext.getBuild().getVcsRootEntries()) {
+            if (entry != null && entry.getVcsRoot() != null) {
+                branchUri = entry.getVcsRoot().getProperty(PluginConstants.URL);
+                branchName = entry.getVcsRoot().getProperty(PluginConstants.BRANCH);
 
-        for (VcsRootEntry entry: myContext.getBuild().getVcsRootEntries()) {
-            branchUri = entry.getVcsRoot().getProperty(PluginConstants.URL);
-            branchName = entry.getVcsRoot().getProperty(PluginConstants.BRANCH);
+                if (branchName != null && !branchName.isEmpty()) {
+                    String[] arr = branchName.split(PluginConstants.SLASH);
+                    branchName = arr[arr.length - 1];
+                }
+            }
         }
-
-        String[] arr = branchName.split(PluginConstants.SLASH);
-        branchName = arr[arr.length - 1];
 
         Map<String, String> map = new HashMap<>();
         String dirsToExclude = addSoosDirToExclusion(runnerParameters.get(Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY));
