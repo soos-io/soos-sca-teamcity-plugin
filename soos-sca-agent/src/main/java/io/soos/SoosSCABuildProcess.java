@@ -134,6 +134,17 @@ public class SoosSCABuildProcess implements BuildProcess {
         if(StringUtils.isBlank(myContext.getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY))) {
             map.put(Constants.PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, String.valueOf(Constants.MIN_ANALYSIS_RESULT_POLLING_INTERVAL));
         }
+
+        Map<String,String> configParams = myContext.getConfigParameters();
+
+        if(!configParams.get("teamcity.build.triggeredBy.username").isBlank()) {
+            map.put(Constants.PARAM_CONTRIBUTING_DEVELOPER_KEY, configParams.get("teamcity.build.triggeredBy.username"));
+            map.put(Constants.PARAM_CONTRIBUTING_DEVELOPER_ENV_KEY, "teamcity.build.triggeredBy.username");
+        }else if(!configParams.get("teamcity.build.triggeredBy").isBlank()){
+            map.put(Constants.PARAM_CONTRIBUTING_DEVELOPER_KEY, configParams.get("teamcity.build.triggeredBy"));
+            map.put(Constants.PARAM_CONTRIBUTING_DEVELOPER_ENV_KEY, "teamcity.build.triggeredBy");
+        }
+
         return map;
     }
 
