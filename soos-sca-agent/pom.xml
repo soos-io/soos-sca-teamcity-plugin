@@ -4,12 +4,12 @@
   <parent>
     <artifactId>soos-sca</artifactId>
     <groupId>io.soos</groupId>
-    <version>1.4.3</version>
+    <version>1.4.4</version>
   </parent>
   <artifactId>soos-sca-agent</artifactId>
   <packaging>jar</packaging>
   <properties>
-    <soos-sca.version>1.1.4</soos-sca.version>
+    <soos-sca.version>1.1.5</soos-sca.version>
     <sca.version>${project.parent.version}</sca.version>
   </properties>
   <dependencies>
