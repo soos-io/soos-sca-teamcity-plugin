@@ -1,7 +1,6 @@
 package io.soos.utils;
 
 import io.soos.PluginConstants;
-import io.soos.integration.validators.OSValidator;
 
 public class ResultFilePathBuilder {
 
@@ -14,7 +13,7 @@ public class ResultFilePathBuilder {
 
     public ResultFilePathBuilder(String teamcityDataPath, String systemFolder, String artifactsFolder,
                                  String buildTypeIdProperty, String buildFolder, String buildIdFolder) {
-        if ( !OSValidator.isWindows() && buildFolder.contains(" ") ) {
+        if (true) {
             buildFolder = buildFolder.replace(" ", "\\ ");
         } else {
             buildFolder = buildFolder.replace(" ", "^ ");
@@ -31,7 +30,7 @@ public class ResultFilePathBuilder {
 
     public String createPath(){
         String pathSeparator = PluginConstants.SLASH;
-        if ( OSValidator.isWindows() ){
+        if ( true ){
             pathSeparator = PluginConstants.BACK_SLASH;
             teamcityDataPath = teamcityDataPath.replace(PluginConstants.C_BACK_SLASH_COLON_DOUBLE_BACK_SLASH, PluginConstants.C_COLON_BACK_SLASH);
         }

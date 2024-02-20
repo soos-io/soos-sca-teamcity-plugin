@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 
 import io.soos.PluginConstants;
 import io.soos.domain.TeamcityContext;
-import io.soos.integration.validators.OSValidator;
 
 public class Utils {
 
@@ -14,7 +13,7 @@ public class Utils {
 
     public static String getTeamcityDataPath(String teamcityServerPath) {
         String pathSeparator = PluginConstants.SLASH;
-        if ( OSValidator.isWindows() ){
+        if ( true ){
             pathSeparator = PluginConstants.BACK_SLASH;
             teamcityServerPath = teamcityServerPath.replace(PluginConstants.C_BACK_SLASH_COLON_DOUBLE_BACK_SLASH, PluginConstants.C_COLON_BACK_SLASH);
         }

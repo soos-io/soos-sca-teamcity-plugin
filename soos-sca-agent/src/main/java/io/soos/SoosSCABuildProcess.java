@@ -1,10 +1,9 @@
 package io.soos;
 
 import io.soos.domain.TeamcityContext;
-import io.soos.integration.commons.Constants;
-import io.soos.integration.domain.SOOS;
-import io.soos.integration.domain.analysis.AnalysisResultResponse;
-import io.soos.integration.domain.scan.ScanResponse;
+import io.soos.integration.Configuration;
+import io.soos.integration.Enums;
+import io.soos.integration.SoosScaWrapper;
 import io.soos.utils.Utils;
 import jetbrains.buildServer.RunBuildException;
 import jetbrains.buildServer.agent.BuildFinishedStatus;
@@ -15,14 +14,14 @@ import jetbrains.buildServer.vcs.VcsRootEntry;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 public class SoosSCABuildProcess implements BuildProcess {
-
+    private static Configuration config = new Configuration();
+    private int exitCode = 0;
     private boolean isFinished = false;
     private boolean isInterrupted = false;
     private BuildProgressLogger myBuildLogger;
@@ -48,46 +47,54 @@ public class SoosSCABuildProcess implements BuildProcess {
         }
         Map<String, String> runnerParameters = myContext.getRunnerParameters();
         Map<String, String> map = new HashMap<>(populateContext(runnerParameters));
-        setEnvProperties(map);
-        String onFailure = myContext.getRunnerParameters().get(Constants.MAP_PARAM_ON_FAILURE_KEY);
-        String result;
-        String scanStatus = "";
-        try {
-            SOOS soos = new SOOS();
-            soos.getContext().setScriptVersion(getVersionFromProperties());
-            ScanResponse scan;
-            AnalysisResultResponse analysisResultResponse;
-            myBuildLogger.message("--------------------------------------------");
-            myBuildLogger.message("SOOS SCA Scan");
-            myBuildLogger.message("--------------------------------------------");
-            myBuildLogger.message("Analysis request is running");
-            scan = soos.startAnalysis();
-            analysisResultResponse = soos.getResults(scan.getScanStatusUrl());
-            result = analysisResultResponse.getScanUrl();
-            scanStatus = analysisResultResponse.getStatus();
-            myBuildLogger.message("Scan analysis finished successfully. To see the full report go to: " + result);
-            myBuildLogger.message("Violations found: " + analysisResultResponse.getViolations() + " | Vulnerabilities found: " + analysisResultResponse.getVulnerabilities() );
-        } catch (Exception e) {
-            StringBuilder errorMsg = new StringBuilder("SOOS SCA cannot be done, error: ").append(e);
-            RunBuildException exception = new RunBuildException(errorMsg.toString());
-            exception.setLogStacktrace(false);
-            throw exception;
-        }
+        setConfigurationProperties(map, config);
 
-        if(scanStatus.equals(PluginConstants.FAILED_WITH_ISSUES) && onFailure.equals(PluginConstants.FAIL_THE_BUILD)) {
-            RunBuildException exception = new RunBuildException("Scan failed due to vulnerabilities/policy violations");
-            exception.setLogStacktrace(false);
-            throw exception;
+        try {
+            PrintStream printStream = new PrintStream(new OutputStream() {
+                private ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+                @Override
+                public void write(int b) throws IOException {
+                    buffer.write(b);
+                    if (b == '\n') {
+                        myBuildLogger.message(buffer.toString("UTF-8"));
+                        buffer.reset();
+                    }
+                }
+            });
+            SoosScaWrapper soosScaWrapper = new SoosScaWrapper(config, printStream);
+            exitCode =  soosScaWrapper.runSca();
+
+        } catch (Exception e) {
+            StringBuilder errorMsg = new StringBuilder("There was an unexpected error during SOOS Sca Scan: ").append(e);
+            myBuildLogger.error(errorMsg.toString());
+            RunBuildException ex = new RunBuildException(errorMsg.toString(), e);
+            ex.setLogStacktrace(false);
+            throw ex;
         }
 
     }
 
-    private void setEnvProperties(Map<String, String> map){
-        map.forEach((key, value) -> {
-            if(StringUtils.isNotBlank(value) || key.equals(Constants.PARAM_PACKAGE_MANAGERS_KEY) || key.equals(Constants.PARAM_FILES_TO_EXCLUDE_KEY)) {
-                System.setProperty(key, value);
+    private void setConfigurationProperties(Map<String, String> map, Configuration configuration) {
+        Class<?> configClass = configuration.getClass();
+        for (Field field : configClass.getDeclaredFields()) {
+            field.setAccessible(true);
+            String fieldName = field.getName();
+            String value = map.get(fieldName);
+
+            if (map.containsKey(fieldName) && StringUtils.isNotBlank(value)) {
+                try {
+
+                    if (field.getType().equals(boolean.class)) {
+                        field.setBoolean(configuration, Boolean.parseBoolean(value));
+                    } else {
+                        field.set(configuration, value);
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
             }
-        });
+        }
     }
 
     private Map<String, String> populateContext(Map<String, String> runnerParameters) {
@@ -108,67 +115,31 @@ public class SoosSCABuildProcess implements BuildProcess {
         }
 
         Map<String, String> map = new HashMap<>();
-        String dirsToExclude = addSoosDirToExclusion(runnerParameters.get(Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY));
-        map.put(Constants.PARAM_PROJECT_NAME_KEY, runnerParameters.get(Constants.MAP_PARAM_PROJECT_NAME_KEY));
-        map.put(Constants.PARAM_ON_FAILURE_KEY, runnerParameters.get(Constants.MAP_PARAM_ON_FAILURE_KEY));
-        map.put(Constants.PARAM_DIRS_TO_EXCLUDE_KEY, dirsToExclude);
-        map.put(Constants.PARAM_PACKAGE_MANAGERS_KEY, runnerParameters.get(Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY) != null ? runnerParameters.get(Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY) : "");
-        map.put(Constants.PARAM_FILES_TO_EXCLUDE_KEY, runnerParameters.get(Constants.MAP_PARAM_FILES_TO_EXCLUDE_KEY) != null ? runnerParameters.get(Constants.MAP_PARAM_FILES_TO_EXCLUDE_KEY) : "");
-        map.put(Constants.PARAM_WORKSPACE_DIR_KEY, runnerParameters.get(PluginConstants.WORKING_DIR));
-        map.put(Constants.PARAM_CHECKOUT_DIR_KEY, runnerParameters.get(PluginConstants.CHECKOUT_DIR));
-        map.put(Constants.PARAM_API_BASE_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_API_BASE_URI_KEY));
-        map.put(Constants.PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, runnerParameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY));
-        map.put(Constants.PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, runnerParameters.get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY));
-        map.put(Constants.PARAM_OPERATING_ENVIRONMENT_KEY, Utils.getOperatingSystem());
-        map.put(Constants.PARAM_BRANCH_NAME_KEY, branchName);
-        map.put(Constants.PARAM_BRANCH_URI_KEY, branchUri);
-        map.put(Constants.PARAM_COMMIT_HASH_KEY, commitHash);
-        map.put(Constants.PARAM_BUILD_VERSION_KEY, buildId);
-        map.put(Constants.PARAM_BUILD_URI_KEY, runnerParameters.get(Constants.MAP_PARAM_BUILD_URI_KEY));
-        map.put(Constants.PARAM_INTEGRATION_NAME_KEY, PluginConstants.INTEGRATION_NAME);
-        map.put(Constants.SOOS_CLIENT_ID, myContext.getBuildParameters().getSystemProperties().get(Constants.SOOS_CLIENT_ID));
-        map.put(Constants.SOOS_API_KEY, myContext.getBuildParameters().getSystemProperties().get(Constants.SOOS_API_KEY));
-        if(StringUtils.isBlank(myContext.getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY))) {
-            map.put(Constants.PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY, String.valueOf(Constants.MIN_RECOMMENDED_ANALYSIS_RESULT_MAX_WAIT));
-        }
-        if(StringUtils.isBlank(myContext.getRunnerParameters().get(Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY))) {
-            map.put(Constants.PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY, String.valueOf(Constants.MIN_ANALYSIS_RESULT_POLLING_INTERVAL));
-        }
 
+        map.put("operatingEnvironment", Utils.getOperatingSystem());
+        map.put("branchName", branchName);
+        map.put("branchURI", branchUri);
+        map.put("commitHash", commitHash);
+        map.put("buildVersion", buildId);
+        map.put("workingDirectory", runnerParameters.get(PluginConstants.WORKING_DIR));
+        map.put("sourceCodePath", runnerParameters.get(PluginConstants.CHECKOUT_DIR));
+        map.put("integrationName", PluginConstants.INTEGRATION_NAME);
+        map.put("clientId", myContext.getBuildParameters().getSystemProperties().get("SOOS_CLIENT_ID"));
+        map.put("apiKey", myContext.getBuildParameters().getSystemProperties().get("SOOS_API_KEY"));
+        map.putAll(runnerParameters);
         Map<String,String> configParams = myContext.getConfigParameters();
 
         if(!configParams.get("teamcity.build.triggeredBy.username").isBlank()) {
-            map.put(Constants.PARAM_CONTRIBUTING_DEVELOPER_KEY, configParams.get("teamcity.build.triggeredBy.username"));
-            map.put(Constants.PARAM_CONTRIBUTING_DEVELOPER_ENV_KEY, "teamcity.build.triggeredBy.username");
+            map.put("contributingDeveloperId", configParams.get("teamcity.build.triggeredBy.username"));
+            map.put("contributingDeveloperSourceName", "teamcity.build.triggeredBy.username");
         }else if(!configParams.get("teamcity.build.triggeredBy").isBlank()){
-            map.put(Constants.PARAM_CONTRIBUTING_DEVELOPER_KEY, configParams.get("teamcity.build.triggeredBy"));
-            map.put(Constants.PARAM_CONTRIBUTING_DEVELOPER_ENV_KEY, "teamcity.build.triggeredBy");
+            map.put("contributingDeveloperId", configParams.get("teamcity.build.triggeredBy"));
+            map.put("contributingDeveloperSourceName", "teamcity.build.triggeredBy");
         }
 
         return map;
     }
 
-    private String addSoosDirToExclusion(String dirs){
-        if(StringUtils.isNotBlank(dirs)){
-            StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(dirs).append(",").append(PluginConstants.SOOS_DIR_NAME);
-            return stringBuilder.toString();
-        }
-
-        return PluginConstants.SOOS_DIR_NAME;
-    }
-
-    private String getVersionFromProperties(){
-        Properties prop = new Properties();
-        try {
-            prop.load(this.getClass().getResourceAsStream(PluginConstants.PROPERTIES_FILE));
-            return prop.getProperty(PluginConstants.VERSION);
-        } catch (IOException e) {
-            StringBuilder error = new StringBuilder("Cannot read file ").append("'").append(PluginConstants.PROPERTIES_FILE).append("' - ").append(e);
-            myBuildLogger.error(error.toString());
-        }
-        return null;
-    }
 
     @Override
     public boolean isInterrupted() {
@@ -187,6 +158,12 @@ public class SoosSCABuildProcess implements BuildProcess {
 
     @Override
     public BuildFinishedStatus waitFor() throws RunBuildException {
+        if (exitCode != 0) {
+            if(config.getOnFailure().equalsIgnoreCase(Enums.OnFailure.FAIL_THE_BUILD.toString())){
+               return BuildFinishedStatus.FINISHED_FAILED;
+            }
+            return BuildFinishedStatus.FINISHED_WITH_PROBLEMS;
+        }
         return BuildFinishedStatus.FINISHED_SUCCESS;
     }
 
