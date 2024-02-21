@@ -11,8 +11,6 @@ import jetbrains.buildServer.agent.BuildProcess;
 import jetbrains.buildServer.agent.BuildProgressLogger;
 import jetbrains.buildServer.agent.BuildRunnerContext;
 import jetbrains.buildServer.vcs.VcsRootEntry;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -20,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SoosSCABuildProcess implements BuildProcess {
-    private static Configuration config = new Configuration();
+    private static Configuration config;
     private int exitCode = 0;
     private boolean isFinished = false;
     private boolean isInterrupted = false;
@@ -41,12 +39,9 @@ public class SoosSCABuildProcess implements BuildProcess {
         teamcityContext.setBuildConfName(myContext.getBuildParameters().getSystemProperties().get(PluginConstants.TEAMCITY_BUILD_CONF_NAME));
         teamcityContext.setBuildId(myContext.getBuildParameters().getSystemProperties().get(PluginConstants.TEAMCITY_BUILD_ID));
 
-        if ( ObjectUtils.isEmpty(teamcityContext.getDataPath()) ) {
-            String teamcitySeverPath = new File(myContext.getBuildParameters().getSystemProperties().get(PluginConstants.AGENT_HOME_DIR)).getParent();
-            teamcityContext.setDataPath(Utils.getTeamcityDataPath(teamcitySeverPath));
-        }
         Map<String, String> runnerParameters = myContext.getRunnerParameters();
         Map<String, String> map = new HashMap<>(populateContext(runnerParameters));
+        config = new Configuration();
         setConfigurationProperties(map, config);
 
         try {
@@ -82,9 +77,8 @@ public class SoosSCABuildProcess implements BuildProcess {
             String fieldName = field.getName();
             String value = map.get(fieldName);
 
-            if (map.containsKey(fieldName) && StringUtils.isNotBlank(value)) {
+            if (map.containsKey(fieldName)) {
                 try {
-
                     if (field.getType().equals(boolean.class)) {
                         field.setBoolean(configuration, Boolean.parseBoolean(value));
                     } else {

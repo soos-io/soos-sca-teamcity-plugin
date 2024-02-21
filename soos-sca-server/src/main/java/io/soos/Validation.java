@@ -2,7 +2,6 @@ package io.soos;
 
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
