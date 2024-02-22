@@ -3,6 +3,7 @@ package io.soos;
 import io.soos.domain.TeamcityContext;
 import io.soos.integration.Configuration;
 import io.soos.integration.Enums;
+import io.soos.integration.SoosScaParameters;
 import io.soos.integration.SoosScaWrapper;
 import io.soos.utils.Utils;
 import jetbrains.buildServer.RunBuildException;
@@ -110,25 +111,27 @@ public class SoosSCABuildProcess implements BuildProcess {
 
         Map<String, String> map = new HashMap<>();
 
-        map.put("operatingEnvironment", Utils.getOperatingSystem());
-        map.put("branchName", branchName);
-        map.put("branchURI", branchUri);
-        map.put("commitHash", commitHash);
-        map.put("buildVersion", buildId);
-        map.put("workingDirectory", runnerParameters.get(PluginConstants.WORKING_DIR));
-        map.put("sourceCodePath", runnerParameters.get(PluginConstants.CHECKOUT_DIR));
-        map.put("integrationName", PluginConstants.INTEGRATION_NAME);
-        map.put("clientId", myContext.getBuildParameters().getSystemProperties().get("SOOS_CLIENT_ID"));
-        map.put("apiKey", myContext.getBuildParameters().getSystemProperties().get("SOOS_API_KEY"));
+        map.put(SoosScaParameters.API_KEY, myContext.getBuildParameters().getSystemProperties().get("SOOS_API_KEY"));
+        map.put(SoosScaParameters.BRANCH_NAME, branchName);
+        map.put(SoosScaParameters.BRANCH_URI, branchUri);
+        map.put(SoosScaParameters.BUILD_VERSION, buildId);
+        map.put(SoosScaParameters.CLIENT_ID, myContext.getBuildParameters().getSystemProperties().get("SOOS_CLIENT_ID"));
+        map.put(SoosScaParameters.COMMIT_HASH, commitHash);
+        map.put(SoosScaParameters.INTEGRATION_NAME, PluginConstants.INTEGRATION_NAME);
+        map.put(SoosScaParameters.OPERATING_ENVIRONMENT, Utils.getOperatingSystem());
+        map.put(SoosScaParameters.SOURCE_CODE_PATH, runnerParameters.get(PluginConstants.CHECKOUT_DIR));
+        map.put(SoosScaParameters.WORKING_DIRECTORY, runnerParameters.get(PluginConstants.WORKING_DIR));
+
         map.putAll(runnerParameters);
+
         Map<String, String> configParams = myContext.getConfigParameters();
 
         if (!configParams.get("teamcity.build.triggeredBy.username").isBlank()) {
-            map.put("contributingDeveloperId", configParams.get("teamcity.build.triggeredBy.username"));
-            map.put("contributingDeveloperSourceName", "teamcity.build.triggeredBy.username");
+            map.put(SoosScaParameters.CONTRIBUTING_DEVELOPER_ID, configParams.get("teamcity.build.triggeredBy.username"));
+            map.put(SoosScaParameters.CONTRIBUTING_DEVELOPER_SOURCE_NAME, "teamcity.build.triggeredBy.username");
         } else if (!configParams.get("teamcity.build.triggeredBy").isBlank()) {
-            map.put("contributingDeveloperId", configParams.get("teamcity.build.triggeredBy"));
-            map.put("contributingDeveloperSourceName", "teamcity.build.triggeredBy");
+            map.put(SoosScaParameters.CONTRIBUTING_DEVELOPER_ID, configParams.get("teamcity.build.triggeredBy"));
+            map.put(SoosScaParameters.CONTRIBUTING_DEVELOPER_SOURCE_NAME, "teamcity.build.triggeredBy");
         }
 
         return map;

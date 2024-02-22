@@ -1,5 +1,6 @@
 package io.soos;
 
+import io.soos.integration.SoosScaParameters;
 import jetbrains.buildServer.serverSide.InvalidProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -28,21 +29,21 @@ public class Validation {
 
     public static List<InvalidProperty> validateParams(Map<String, String> properties) {
         List<InvalidProperty> list = new ArrayList<>();
-        projectName = properties.get("projectName");
-        logLevel = properties.get("logLevel");
-        verbose = Boolean.parseBoolean(properties.get("verbose"));
-        directoriesToExclude = properties.get("directoriesToExclude");
-        filesToExclude = properties.get("filesToExclude");
-        packageManagers = properties.get("packageManagers");
-        onFailure = properties.get("onFailure");
-        apiURL = properties.get("apiURL");
-        outputFormat = properties.get("outputFormat");
-        nodePath = properties.get("nodePath");
+        projectName = properties.get(SoosScaParameters.PROJECT_NAME);
+        logLevel = properties.get(SoosScaParameters.LOG_LEVEL);
+        verbose = Boolean.parseBoolean(properties.get(SoosScaParameters.VERBOSE));
+        directoriesToExclude = properties.get(SoosScaParameters.DIRECTORIES_TO_EXCLUDE);
+        filesToExclude = properties.get(SoosScaParameters.FILES_TO_EXCLUDE);
+        packageManagers = properties.get(SoosScaParameters.PACKAGE_MANAGERS);
+        onFailure = properties.get(SoosScaParameters.ON_FAILURE);
+        apiURL = properties.get(SoosScaParameters.API_URL);
+        outputFormat = properties.get(SoosScaParameters.OUTPUT_FORMAT);
+        nodePath = properties.get(SoosScaParameters.NODE_PATH);
 
         if (ObjectUtils.isEmpty(projectName)) {
-            list.add(new InvalidProperty("projectName", ErrorMessage.SHOULD_NOT_BE_NULL));
+            list.add(new InvalidProperty(SoosScaParameters.PROJECT_NAME, ErrorMessage.SHOULD_NOT_BE_NULL));
         } else if (projectName.length() < PluginConstants.MIN_NUMBER_OF_CHARACTERS) {
-            list.add(new InvalidProperty("projectName", ErrorMessage.shouldBeMoreThanXCharacters(PluginConstants.MIN_NUMBER_OF_CHARACTERS)));
+            list.add(new InvalidProperty(SoosScaParameters.PROJECT_NAME, ErrorMessage.shouldBeMoreThanXCharacters(PluginConstants.MIN_NUMBER_OF_CHARACTERS)));
         }
 
         return list;
