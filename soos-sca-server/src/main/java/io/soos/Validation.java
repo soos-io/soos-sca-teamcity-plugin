@@ -21,9 +21,12 @@ public class Validation {
     private static String nodePath;
 
 
-    public Validation(){};
+    public Validation() {
+    }
 
-    public static List<InvalidProperty> validateParams(Map<String, String> properties){
+    ;
+
+    public static List<InvalidProperty> validateParams(Map<String, String> properties) {
         List<InvalidProperty> list = new ArrayList<>();
         projectName = properties.get("projectName");
         logLevel = properties.get("logLevel");
@@ -36,9 +39,9 @@ public class Validation {
         outputFormat = properties.get("outputFormat");
         nodePath = properties.get("nodePath");
 
-        if ( ObjectUtils.isEmpty(projectName) ) {
+        if (ObjectUtils.isEmpty(projectName)) {
             list.add(new InvalidProperty("projectName", ErrorMessage.SHOULD_NOT_BE_NULL));
-        } else if( projectName.length() < PluginConstants.MIN_NUMBER_OF_CHARACTERS ){
+        } else if (projectName.length() < PluginConstants.MIN_NUMBER_OF_CHARACTERS) {
             list.add(new InvalidProperty("projectName", ErrorMessage.shouldBeMoreThanXCharacters(PluginConstants.MIN_NUMBER_OF_CHARACTERS)));
         }
 

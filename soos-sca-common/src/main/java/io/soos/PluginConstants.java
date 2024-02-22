@@ -2,7 +2,8 @@ package io.soos;
 
 public final class PluginConstants {
 
-    private PluginConstants() {}
+    private PluginConstants() {
+    }
 
     public static final String DISPLAY_NAME = "SOOS SCA";
     public static final String DESCRIPTION = "Scan your open source software for vulnerabilities and control the introduction of new dependencies";

@@ -58,7 +58,7 @@ public class SoosSCABuildProcess implements BuildProcess {
                 }
             });
             SoosScaWrapper soosScaWrapper = new SoosScaWrapper(config, printStream);
-            exitCode =  soosScaWrapper.runSca();
+            exitCode = soosScaWrapper.runSca();
 
         } catch (Exception e) {
             StringBuilder errorMsg = new StringBuilder("There was an unexpected error during SOOS Sca Scan: ").append(e);
@@ -121,12 +121,12 @@ public class SoosSCABuildProcess implements BuildProcess {
         map.put("clientId", myContext.getBuildParameters().getSystemProperties().get("SOOS_CLIENT_ID"));
         map.put("apiKey", myContext.getBuildParameters().getSystemProperties().get("SOOS_API_KEY"));
         map.putAll(runnerParameters);
-        Map<String,String> configParams = myContext.getConfigParameters();
+        Map<String, String> configParams = myContext.getConfigParameters();
 
-        if(!configParams.get("teamcity.build.triggeredBy.username").isBlank()) {
+        if (!configParams.get("teamcity.build.triggeredBy.username").isBlank()) {
             map.put("contributingDeveloperId", configParams.get("teamcity.build.triggeredBy.username"));
             map.put("contributingDeveloperSourceName", "teamcity.build.triggeredBy.username");
-        }else if(!configParams.get("teamcity.build.triggeredBy").isBlank()){
+        } else if (!configParams.get("teamcity.build.triggeredBy").isBlank()) {
             map.put("contributingDeveloperId", configParams.get("teamcity.build.triggeredBy"));
             map.put("contributingDeveloperSourceName", "teamcity.build.triggeredBy");
         }
@@ -153,8 +153,8 @@ public class SoosSCABuildProcess implements BuildProcess {
     @Override
     public BuildFinishedStatus waitFor() throws RunBuildException {
         if (exitCode != 0) {
-            if(config.getOnFailure().equalsIgnoreCase(Enums.OnFailure.FAIL_THE_BUILD.toString())){
-               return BuildFinishedStatus.FINISHED_FAILED;
+            if (config.getOnFailure().equalsIgnoreCase(Enums.OnFailure.FAIL_THE_BUILD.toString())) {
+                return BuildFinishedStatus.FINISHED_FAILED;
             }
             return BuildFinishedStatus.FINISHED_WITH_PROBLEMS;
         }

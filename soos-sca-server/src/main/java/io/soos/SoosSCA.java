@@ -6,20 +6,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 
 
 public class SoosSCA extends RunType {
-    
-    private PluginDescriptor descriptor;    
-    
+
+    private PluginDescriptor descriptor;
+
     public SoosSCA(RunTypeRegistry registry,
-                        PluginDescriptor descriptor){
+                   PluginDescriptor descriptor) {
         this.descriptor = descriptor;
         registry.registerRunType(this);
     }
-    
+
     @Override
     public String getDescription() {
         return PluginConstants.DESCRIPTION;
@@ -31,7 +32,7 @@ public class SoosSCA extends RunType {
     }
 
     @Override
-    public String getType() {      
+    public String getType() {
         return PluginConstants.TYPE;
     }
 
@@ -50,9 +51,10 @@ public class SoosSCA extends RunType {
         };
 
     }
+
     @Override
     public String getEditRunnerParamsJspFilePath() {
-       return descriptor.getPluginResourcesPath(PluginConstants.EDIT_PARAMETERS_FILE_NAME);
+        return descriptor.getPluginResourcesPath(PluginConstants.EDIT_PARAMETERS_FILE_NAME);
     }
 
     @Override
