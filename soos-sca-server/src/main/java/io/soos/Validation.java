@@ -12,7 +12,7 @@ public class Validation {
     private static String projectName;
     private static String logLevel;
     private static Boolean verbose;
-    private static String dirsToExclude;
+    private static String directoriesToExclude;
     private static String filesToExclude;
     private static String packageManagers;
     private static String onFailure;
@@ -31,7 +31,7 @@ public class Validation {
         projectName = properties.get("projectName");
         logLevel = properties.get("logLevel");
         verbose = Boolean.parseBoolean(properties.get("verbose"));
-        dirsToExclude = properties.get("dirsToExclude");
+        directoriesToExclude = properties.get("directoriesToExclude");
         filesToExclude = properties.get("filesToExclude");
         packageManagers = properties.get("packageManagers");
         onFailure = properties.get("onFailure");

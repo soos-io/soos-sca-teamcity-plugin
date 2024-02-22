@@ -6,7 +6,7 @@
 
 
 <c:set var="projectName" value="projectName"/>
-<c:set var="dirsToExclude" value="dirsToExclude"/>
+<c:set var="directoriesToExclude" value="directoriesToExclude"/>
 <c:set var="filesToExclude" value="filesToExclude"/>
 <c:set var="packageManagers" value="packageManagers"/>
 <c:set var="onFailure" value="onFailure"/>
@@ -28,11 +28,11 @@
         </td>
     </tr>
     <tr>
-        <th><label for="${dirsToExclude}">Directories To Exclude: </label></th>
+        <th><label for="${directoriesToExclude}">Directories To Exclude: </label></th>
         <td>
             <div class="posRel">
-                <props:textProperty name="${dirsToExclude}" size="36" />
-                <span class="error" id="error_${dirsToExclude}"></span>
+                <props:textProperty name="${directoriesToExclude}" size="36" />
+                <span class="error" id="error_${directoriesToExclude}"></span>
             </div>
             <div>
                 <label>Separate directory names with a comma</label>
