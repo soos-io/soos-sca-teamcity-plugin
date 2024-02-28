@@ -9,7 +9,7 @@
   <artifactId>soos-sca-server</artifactId>
   <packaging>jar</packaging>
   <properties>
-    <soos-sca.version>2.0.0</soos-sca.version>
+    <soos-sca.version>2.0.1</soos-sca.version>
     <sca.version>${project.parent.version}</sca.version>
   </properties>
 
