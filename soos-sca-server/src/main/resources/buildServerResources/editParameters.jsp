@@ -1,24 +1,20 @@
-<%@ page import="io.soos.integration.commons.Constants" %>
 <%@ taglib prefix="props" tagdir="/WEB-INF/tags/props" %>
 <%@ taglib prefix="forms" tagdir="/WEB-INF/tags/forms" %>
 <%@ taglib prefix="l" tagdir="/WEB-INF/tags/layout" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <jsp:useBean id="propertiesBean" scope="request" type="jetbrains.buildServer.controllers.BasePropertiesBean"/>
 
-<c:set var="projectName" value="<%=Constants.MAP_PARAM_PROJECT_NAME_KEY%>"/>
-<c:set var="commitHash" value="<%=Constants.MAP_PARAM_COMMIT_HASH_KEY%>"/>
-<c:set var="branchURI" value="<%=Constants.MAP_PARAM_BRANCH_URI_KEY%>"/>
-<c:set var="branchName" value="<%=Constants.MAP_PARAM_BRANCH_NAME_KEY%>"/>
-<c:set var="buildVersion" value="<%=Constants.MAP_PARAM_BUILD_VERSION_KEY%>"/>
-<c:set var="buildURI" value="<%=Constants.MAP_PARAM_BUILD_URI_KEY%>"/>
-<c:set var="dirsToExclude" value="<%=Constants.MAP_PARAM_DIRS_TO_EXCLUDE_KEY%>"/>
-<c:set var="filesToExclude" value="<%=Constants.MAP_PARAM_FILES_TO_EXCLUDE_KEY%>"/>
-<c:set var="packageManagers" value="<%=Constants.MAP_PARAM_PACKAGE_MANAGERS_KEY%>"/>
 
-<c:set var="onFailure" value="<%=Constants.MAP_PARAM_ON_FAILURE_KEY%>"/>
-<c:set var="analysisResultMaxWait" value="<%=Constants.MAP_PARAM_ANALYSIS_RESULT_MAX_WAIT_KEY%>"/>
-<c:set var="resultPollingInterval" value="<%=Constants.MAP_PARAM_ANALYSIS_RESULT_POLLING_INTERVAL_KEY%>"/>
-<c:set var="apiBaseURI" value="<%=Constants.MAP_PARAM_API_BASE_URI_KEY%>"/>
+<c:set var="projectName" value="projectName"/>
+<c:set var="directoriesToExclude" value="directoriesToExclude"/>
+<c:set var="filesToExclude" value="filesToExclude"/>
+<c:set var="packageManagers" value="packageManagers"/>
+<c:set var="onFailure" value="onFailure"/>
+<c:set var="apiURL" value="apiURL"/>
+<c:set var="logLevel" value="logLevel"/>
+<c:set var="verbose" value="verbose"/>
+<c:set var="outputFormat" value="outputFormat"/>
+<c:set var="nodePath" value="nodePath"/>
 
 
 <l:settingsGroup title="SOOS SCA settings">
@@ -32,20 +28,11 @@
         </td>
     </tr>
     <tr>
-        <th><label for="${buildURI}">Build URI: </label></th>
+        <th><label for="${directoriesToExclude}">Directories To Exclude: </label></th>
         <td>
             <div class="posRel">
-                <props:textProperty name="${buildURI}" size="36" />
-                <span class="error" id="error_${buildURI}"></span>
-            </div>
-        </td>
-    </tr>
-    <tr>
-        <th><label for="${dirsToExclude}">Directories To Exclude: </label></th>
-        <td>
-            <div class="posRel">
-                <props:textProperty name="${dirsToExclude}" size="36" />
-                <span class="error" id="error_${dirsToExclude}"></span>
+                <props:textProperty name="${directoriesToExclude}" size="36" />
+                <span class="error" id="error_${directoriesToExclude}"></span>
             </div>
             <div>
                 <label>Separate directory names with a comma</label>
@@ -65,6 +52,18 @@
         </td>
     </tr>
     <tr>
+        <th><label for="${packageManagers}">Package Managers to look for: </label></th>
+        <td>
+            <div class="posRel">
+                <props:textProperty name="${packageManagers}" size="36"/>
+                <span class="error" id="error_${packageManagers}"></span>
+            </div>
+            <div>
+                <label>Separate Package Manager names with a comma</label>
+            </div>
+        </td>
+    </tr>
+    <tr>
         <th><label for="${onFailure}">On Failure: </label></th>
         <td>
             <div class="posRel">
@@ -76,43 +75,55 @@
         </td>
     </tr>
     <tr>
-        <th><label for="${packageManagers}">Package Managers to look for: </label></th>
+        <th><label for="${apiURL}">API Base URL: </label></th>
         <td>
             <div class="posRel">
-                <props:textProperty name="${packageManagers}" size="36" />
-                <span class="error" id="error_${packageManagers}"></span>
-            </div>
-            <div>
-                <label>Separate Package Manager names with a comma</label>
+                <props:textProperty name="${apiURL}" size="36" />
+                <span class="error" id="error_${apiURL}"></span>
             </div>
         </td>
     </tr>
     <tr>
-        <th><label for="${analysisResultMaxWait}">Analysis Res. Max Wait: </label></th>
+        <th><label for="${logLevel}">Log Level: </label></th>
         <td>
             <div class="posRel">
-                <props:textProperty name="${analysisResultMaxWait}" size="36" />
-                <span class="error" id="error_${analysisResultMaxWait}"></span>
+                <props:selectProperty name="${logLevel}">
+                    <props:option value="DEBUG">DEBUG</props:option>
+                    <props:option value="INFO">INFO</props:option>
+                    <props:option value="WARN">WARN</props:option>
+                    <props:option value="FAIL">FAIL</props:option>
+                    <props:option value="ERROR">ERROR</props:option>
+                </props:selectProperty>
             </div>
         </td>
     </tr>
     <tr>
-        <th><label for="${resultPollingInterval}">Analysis Res. Polling Interval: </label></th>
+        <th><label for="${verbose}">Enable Verbose Logging: </label></th>
         <td>
             <div class="posRel">
-                <props:textProperty name="${resultPollingInterval}" size="36" />
-                <span class="error" id="error_${resultPollingInterval}"></span>
+                <props:checkboxProperty name="${verbose}" />
             </div>
         </td>
     </tr>
     <tr>
-        <th><label for="${apiBaseURI}">API Base URL: </label></th>
+        <th><label for="${outputFormat}">Output Format: </label></th>
         <td>
             <div class="posRel">
-                <props:textProperty name="${apiBaseURI}" size="36" />
-                <span class="error" id="error_${apiBaseURI}"></span>
+                <props:textProperty name="${outputFormat}" size="36" />
+                <span class="error" id="error_${outputFormat}"></span>
             </div>
         </td>
     </tr>
+    <tr>
+        <th><label for="${nodePath}">Node Path: </label></th>
+        <td>
+            <div class="posRel">
+                <props:textProperty name="${nodePath}" size="36" />
+                <span class="error" id="error_${nodePath}"></span>
+            </div>
+        </td>
+    </tr>
+
+
 
 </l:settingsGroup>

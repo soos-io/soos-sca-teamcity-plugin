@@ -11,7 +11,8 @@ public class TeamcityContext {
     private String buildId;
     private File agentTempDirectory;
 
-    public TeamcityContext(){}
+    public TeamcityContext() {
+    }
 
     public TeamcityContext(String dataPath, String buildTypeId, String buildConfName, String buildId, File agentTempDirectory) {
         this.dataPath = dataPath;
