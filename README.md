@@ -22,7 +22,8 @@ To use SOOS SCA Plugin you need to:
 
 ## Supported Languages and Package Managers
 
-*	[Node (NPM)](https://www.npmjs.com/)
+*	[C++ (Conan)](https://conan.io/center/)
+*       [Node (NPM)](https://www.npmjs.com/)
 *	[Python (pypi)](https://pypi.org/)
 *	[.NET (NuGet)](https://www.nuget.org/)
 *	[Ruby (Ruby Gems)](https://rubygems.org/)
